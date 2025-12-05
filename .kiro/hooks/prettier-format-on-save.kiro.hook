@@ -1,0 +1,19 @@
+{
+  "enabled": true,
+  "name": "Prettier Format on Save",
+  "description": "Automatically runs Prettier to format JavaScript and TypeScript files when they are saved",
+  "version": "1",
+  "when": {
+    "type": "fileEdited",
+    "patterns": [
+      "**/*.js",
+      "**/*.jsx",
+      "**/*.ts",
+      "**/*.tsx"
+    ]
+  },
+  "then": {
+    "type": "runCommand",
+    "command": "npx prettier --write \"${filePath}\""
+  }
+}
