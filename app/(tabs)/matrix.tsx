@@ -1,12 +1,14 @@
 import { ThemedText } from '@/components/theme/themed-text';
 import { ThemedView } from '@/components/theme/themed-view';
-import { stations } from '@/constants/station-list';
+import { stations, stationSpecialCases } from '@/constants/station-list';
 import { useTheme } from '@/contexts/theme-context';
 import { useThemedStyles } from '@/hooks/use-themed-styles';
 import { DistanceMatrix } from '@/utils/distance-matrix';
 import { Ionicons } from '@expo/vector-icons';
 import React, { useEffect, useState } from 'react';
 import {
+  Alert,
+  Linking,
   Modal,
   ScrollView,
   StyleSheet,
@@ -39,19 +41,46 @@ export default function MatrixScreen() {
     }
   }, [userGroup.baseStation, fromStation]);
 
+  const getSearchTerm = (stationName: string) => {
+    const name = stationName.replace(/^\d+\s+/, '');
+    if (stationSpecialCases[name]) {
+      const specialCase = stationSpecialCases[name];
+      if (specialCase.includes('NSW') && specialCase.includes('St,')) {
+        return specialCase;
+      }
+      return `Fire and Rescue NSW ${specialCase} Fire Station NSW`;
+    }
+    return `Fire and Rescue NSW ${name} Fire Station NSW`;
+  };
+
+  const openRouteInGoogleMaps = () => {
+    if (!fromStation || !toStation) return;
+    const origin = encodeURIComponent(getSearchTerm(fromStation));
+    const destination = encodeURIComponent(getSearchTerm(toStation));
+    
+    // Try native app first (works on both iOS and Android)
+    const nativeUrl = `comgooglemaps://?saddr=${origin}&daddr=${destination}&directionsmode=driving`;
+    const webUrl = `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${destination}&travelmode=driving`;
+
+    Linking.openURL(nativeUrl).catch(() => {
+      // Fallback to web if app not installed
+      Linking.openURL(webUrl).catch(() => {
+        Alert.alert('Error', 'Could not open Google Maps');
+      });
+    });
+  };
+
   const handleButtonPress = () => {
     if (distance) {
-      // Clear form if distance is already calculated
       setFromStation('');
       setToStation('');
       setDistance(null);
     } else if (fromStation && toStation) {
-      // Calculate distance
       setLoading(true);
       setTimeout(() => {
         try {
-          const fromName = fromStation.split(' ').slice(1).join(' ');
-          const toName = toStation.split(' ').slice(1).join(' ');
+          const fromName = fromStation.replace(/^\d+\s+/, '');
+          const toName = toStation.replace(/^\d+\s+/, '');
           const result = distanceMatrix.getDistance(fromName, toName);
           setDistance(result || 'N/A');
         } catch (error) {
@@ -98,11 +127,33 @@ export default function MatrixScreen() {
 
           {/* Result Card (Hero) */}
           <View style={[styles.resultCard, { backgroundColor: colors.surfaceElevated, borderColor: colors.borderLight }]}>
-             <ThemedText style={styles.resultLabel}>DISTANCE</ThemedText>
-             <ThemedText style={[styles.resultValue, { color: distance ? colors.text : colors.textMuted }]}>
-               {distance || '---'}
-             </ThemedText>
-             {distance && <ThemedText style={styles.resultUnit}>Return Kilometers</ThemedText>}
+             {distance !== 'N/A' && (
+               <>
+                 <ThemedText style={styles.resultLabel}>DISTANCE</ThemedText>
+                 <ThemedText style={[styles.resultValue, { color: distance ? colors.text : colors.textMuted }]}>
+                   {distance || '---'}
+                 </ThemedText>
+                 {distance && <ThemedText style={styles.resultUnit}>Return Kilometers</ThemedText>}
+               </>
+             )}
+             {distance === 'N/A' && (
+               <>
+                 <ThemedText style={[styles.notInMatrixText, { color: colors.textMuted }]}>
+                   Not in official matrix
+                 </ThemedText>
+                 <ThemedText style={[styles.essClaimText, { color: colors.textMuted }]}>
+                   You are required to submit a quick claim in ESS
+                 </ThemedText>
+                 <TouchableOpacity 
+                   style={[styles.mapsButton, { backgroundColor: colors.primary }]}
+                   onPress={openRouteInGoogleMaps}
+                   activeOpacity={0.8}
+                 >
+                   <Ionicons name="map" size={18} color="#FFF" />
+                   <ThemedText style={styles.mapsButtonText}>View Route in Maps</ThemedText>
+                 </TouchableOpacity>
+               </>
+             )}
           </View>
 
           {/* Form Card */}
@@ -142,7 +193,11 @@ export default function MatrixScreen() {
       <StationPickerModal 
         visible={showFromPicker} 
         onClose={() => setShowFromPicker(false)} 
-        onSelect={(val: string) => { setFromStation(val); setDistance(null); }} 
+        onSelect={(val: string) => { 
+          setFromStation(val); 
+          setDistance(null); 
+          setShowFromPicker(false);
+        }} 
         title="From Station"
         stations={stations}
         colors={colors}
@@ -150,7 +205,11 @@ export default function MatrixScreen() {
       <StationPickerModal 
         visible={showToPicker} 
         onClose={() => setShowToPicker(false)} 
-        onSelect={(val: string) => { setToStation(val); setDistance(null); }} 
+        onSelect={(val: string) => { 
+          setToStation(val); 
+          setDistance(null);
+          setShowToPicker(false);
+        }} 
         title="To Station"
         stations={stations}
         colors={colors}
@@ -175,7 +234,7 @@ const StationPickerModal = ({ visible, onClose, onSelect, title, stations, color
             <TouchableOpacity
               key={value}
               style={[styles.modalItem, { borderBottomColor: colors.borderLight }]}
-              onPress={() => { onSelect(label); onClose(); }}
+              onPress={() => onSelect(label)}
             >
               <ThemedText style={{ fontSize: 16 }}>{label}</ThemedText>
             </TouchableOpacity>
@@ -220,6 +279,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: 24,
     borderWidth: 1,
+    paddingVertical: 20,
   },
   resultLabel: {
     fontSize: 12,
@@ -307,5 +367,31 @@ const styles = StyleSheet.create({
   modalItem: {
     padding: 16,
     borderBottomWidth: 1,
+  },
+  notInMatrixText: {
+    fontSize: 16,
+    fontWeight: '500',
+    marginBottom: 8,
+  },
+  essClaimText: {
+    fontSize: 13,
+    fontWeight: '400',
+    marginBottom: 16,
+    textAlign: 'center',
+    paddingHorizontal: 20,
+  },
+  mapsButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingHorizontal: 20,
+    paddingVertical: 14,
+    borderRadius: 12,
+    marginTop: 8,
+  },
+  mapsButtonText: {
+    color: '#FFF',
+    fontSize: 15,
+    fontWeight: '600',
   },
 });
