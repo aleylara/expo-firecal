@@ -38,7 +38,7 @@ export default function NextAnnuals({ nextAnnuals }: NextAnnualsProps) {
       <View style={[common.surfaceElevated, styles.card, { borderColor: colors.borderLight, borderWidth: 1 }]}>
         <View style={styles.inlineHeader}>
              <Ionicons name="calendar-outline" size={16} color={colors.primary} />
-             <Text style={[styles.inlineTitle, { color: colors.text }]}>Next Leave</Text>
+             <Text style={[styles.inlineTitle, { color: colors.text }]}>Next Annual - Leave Date</Text>
         </View>
         <View style={styles.container}>
           {sortedAnnuals.map((period, index) => (

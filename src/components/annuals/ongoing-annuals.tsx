@@ -40,7 +40,7 @@ export default function OngoingAnnuals({
       <View style={[common.surfaceElevated, styles.card, { borderColor: colors.borderLight, borderWidth: 1 }]}>
         <View style={styles.inlineHeader}>
              <Ionicons name="time-outline" size={16} color={colors.primary} />
-             <Text style={[styles.inlineTitle, { color: colors.text }]}>On Leave</Text>
+             <Text style={[styles.inlineTitle, { color: colors.text }]}>On Annual - Return Date</Text>
         </View>
         <View style={styles.container}>
           {sortedAnnuals.map((period, index) => (
