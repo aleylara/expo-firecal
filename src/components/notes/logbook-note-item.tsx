@@ -7,17 +7,34 @@
 import { formatDateString } from '@/constants/timezone';
 import { useThemedStyles } from '@/hooks/use-themed-styles';
 import { Note } from '@/types/notes';
+import { Ionicons } from '@expo/vector-icons';
 import React, { useMemo } from 'react';
-import { StyleSheet, Text, TouchableOpacity } from 'react-native';
+import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 interface LogbookNoteItemProps {
   item: Note;
   onPress: (date: string) => void;
+  onDelete: (date: string) => void;
 }
 
 export const LogbookNoteItem = React.memo(
-  ({ item, onPress }: LogbookNoteItemProps) => {
+  ({ item, onPress, onDelete }: LogbookNoteItemProps) => {
     const { colors, tokens } = useThemedStyles();
+
+    const handleDelete = () => {
+      Alert.alert(
+        'Delete Note',
+        'Are you sure you want to delete this note?',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          {
+            text: 'Delete',
+            style: 'destructive',
+            onPress: () => onDelete(item.date),
+          },
+        ],
+      );
+    };
 
     const styles = useMemo(
       () =>
@@ -48,6 +65,15 @@ export const LogbookNoteItem = React.memo(
             lineHeight: 20,
             fontStyle: 'italic',
           },
+          header: {
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: 2,
+          },
+          deleteButton: {
+            padding: 4,
+          },
         }),
       [colors, tokens],
     );
@@ -58,9 +84,18 @@ export const LogbookNoteItem = React.memo(
         onPress={() => onPress(item.date)}
         activeOpacity={0.7}
       >
-        <Text style={styles.itemDate}>
-          {formatDateString(item.date, 'EEE, d MMMM')}
-        </Text>
+        <View style={styles.header}>
+          <Text style={styles.itemDate}>
+            {formatDateString(item.date, 'EEE, d MMMM')}
+          </Text>
+          <TouchableOpacity
+            style={styles.deleteButton}
+            onPress={handleDelete}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          >
+            <Ionicons name="trash-outline" size={18} color={colors.error} />
+          </TouchableOpacity>
+        </View>
         {item.title ? (
           <Text style={styles.itemTitle}>{item.title}</Text>
         ) : null}

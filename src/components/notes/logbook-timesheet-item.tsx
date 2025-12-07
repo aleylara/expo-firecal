@@ -7,17 +7,34 @@
 import { formatDateString, formatHHMMToDisplay } from '@/constants/timezone';
 import { useThemedStyles } from '@/hooks/use-themed-styles';
 import { Timesheet } from '@/types/notes';
+import { Ionicons } from '@expo/vector-icons';
 import React, { useMemo } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 interface LogbookTimesheetItemProps {
   item: Timesheet;
   onPress: (date: string) => void;
+  onDelete: (date: string) => void;
 }
 
 export const LogbookTimesheetItem = React.memo(
-  ({ item, onPress }: LogbookTimesheetItemProps) => {
+  ({ item, onPress, onDelete }: LogbookTimesheetItemProps) => {
     const { colors, tokens } = useThemedStyles();
+
+    const handleDelete = () => {
+      Alert.alert(
+        'Delete Timesheet',
+        'Are you sure you want to delete this timesheet entry?',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          {
+            text: 'Delete',
+            style: 'destructive',
+            onPress: () => onDelete(item.date),
+          },
+        ],
+      );
+    };
 
     const styles = useMemo(
       () =>
@@ -51,6 +68,15 @@ export const LogbookTimesheetItem = React.memo(
             color: colors.primary,
             fontWeight: '500',
           },
+          header: {
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: 2,
+          },
+          deleteButton: {
+            padding: 4,
+          },
         }),
       [colors, tokens],
     );
@@ -72,9 +98,18 @@ export const LogbookTimesheetItem = React.memo(
         activeOpacity={0.7}
       >
         {/* Line 0: Date */}
-        <Text style={styles.itemDate}>
-          {formatDateString(item.date, 'EEE, d MMMM')}
-        </Text>
+        <View style={styles.header}>
+          <Text style={styles.itemDate}>
+            {formatDateString(item.date, 'EEE, d MMMM')}
+          </Text>
+          <TouchableOpacity
+            style={styles.deleteButton}
+            onPress={handleDelete}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          >
+            <Ionicons name="trash-outline" size={18} color={colors.error} />
+          </TouchableOpacity>
+        </View>
 
         {/* Line 1: Time & Hours */}
         <Text style={styles.rowText}>{timeString}</Text>
