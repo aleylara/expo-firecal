@@ -64,15 +64,27 @@ export const LogbookTimesheetItem = React.memo(
             marginTop: 4,
             fontStyle: 'italic',
           },
-          recallText: {
-            color: colors.primary,
-            fontWeight: '500',
-          },
           header: {
             flexDirection: 'row',
             justifyContent: 'space-between',
             alignItems: 'center',
             marginBottom: 2,
+          },
+          dateRow: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 8,
+          },
+          otBadge: {
+            paddingHorizontal: 6,
+            paddingVertical: 2,
+            borderRadius: 4,
+          },
+          otBadgeText: {
+            color: colors.warning,
+            fontSize: 10,
+            fontWeight: '700',
+            letterSpacing: 0.5,
           },
           deleteButton: {
             padding: 4,
@@ -99,9 +111,16 @@ export const LogbookTimesheetItem = React.memo(
       >
         {/* Line 0: Date */}
         <View style={styles.header}>
-          <Text style={styles.itemDate}>
-            {formatDateString(item.date, 'EEE, d MMMM')}
-          </Text>
+          <View style={styles.dateRow}>
+            <Text style={styles.itemDate}>
+              {formatDateString(item.date, 'EEE, d MMMM')}
+            </Text>
+            {item.overtime_shift === 1 && (
+              <View style={[styles.otBadge, { backgroundColor: colors.surfaceHighlight }]}>
+                <Text style={styles.otBadgeText}>OT</Text>
+              </View>
+            )}
+          </View>
           <TouchableOpacity
             style={styles.deleteButton}
             onPress={handleDelete}
@@ -114,15 +133,8 @@ export const LogbookTimesheetItem = React.memo(
         {/* Line 1: Time & Hours */}
         <Text style={styles.rowText}>{timeString}</Text>
 
-        {/* Line 2: Route & Recall */}
-        {routeString && (
-          <Text style={styles.rowText}>
-            {routeString}
-            {item.overtime_shift === 1 && (
-              <Text style={styles.recallText}>  Recall</Text>
-            )}
-          </Text>
-        )}
+        {/* Line 2: Route */}
+        {routeString && <Text style={styles.rowText}>{routeString}</Text>}
 
         {/* Line 3: Notes snippet */}
         {item.more_info ? (

@@ -281,7 +281,14 @@ export default function DayEntryModal({
                   <View style={styles.cardContent}>
                     {timesheet ? (
                       <>
-                        <Text style={styles.cardTitle}>Shift Entry</Text>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 2 }}>
+                          <Text style={styles.cardTitle}>Shift Entry</Text>
+                          {timesheet.overtime_shift === 1 && (
+                            <View style={{ backgroundColor: colors.surfaceHighlight, paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 }}>
+                              <Text style={{ fontSize: 10, fontWeight: '700', color: colors.warning }}>OT</Text>
+                            </View>
+                          )}
+                        </View>
                         <View>
                           {/* Time & Hours */}
                           {timesheet.start_time && timesheet.finish_time && (
@@ -297,11 +304,6 @@ export default function DayEntryModal({
                               {timesheet.to_station ? timesheet.to_station : 'No Destination'} 
                               {timesheet.return_kms ? ` • ${timesheet.return_kms}km` : ''}
                             </Text>
-                          )}
-
-                          {/* Recall / OT */}
-                          {timesheet.overtime_shift === 1 && (
-                            <Text style={[styles.cardSubtitle, { color: colors.primary }]}>Recall</Text>
                           )}
                         </View>
                       </>

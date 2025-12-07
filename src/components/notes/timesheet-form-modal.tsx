@@ -411,13 +411,17 @@ export default function TimesheetFormModal({
 
             {/* Other Details Group */}
             <FormGroup title="Additional Info" colors={colors}>
-               <View style={[styles.formRow, { borderBottomWidth: 0.5, borderBottomColor: colors.borderLight, justifyContent: 'space-between' }]}>
-                 <Text style={[styles.rowLabel, { color: colors.text }]}>Recall/Overtime</Text>
+               <View style={[styles.formRow, styles.switchRow, { borderBottomWidth: 0.5, borderBottomColor: colors.borderLight }]}>
+                 <View style={styles.switchLabelContainer}>
+                   <Text style={[styles.rowLabel, { color: colors.text }]}>Overtime</Text>
+                 </View>
                  <Switch
                     value={overtimeShift}
                     onValueChange={setOvertimeShift}
-                    trackColor={{ false: colors.border, true: colors.primary }}
-                    thumbColor={colors.surface}
+                    trackColor={{ false: colors.borderStrong, true: colors.success }}
+                    thumbColor={colors.switchThumb}
+                    ios_backgroundColor={colors.borderStrong}
+                    style={{ transform: [{ scaleX: 1.1 }, { scaleY: 1.1 }] }}
                   />
                </View>
                <FormRow 
@@ -428,12 +432,12 @@ export default function TimesheetFormModal({
                  colors={colors}
                />
                 <View style={[styles.formRow, { height: 'auto', flexDirection: 'column', alignItems: 'flex-start', paddingTop: 12, paddingBottom: 12 }]}>
-                 <Text style={[styles.rowLabel, { color: colors.text, marginBottom: 8 }]}>Notes</Text>
+                 <Text style={[styles.rowLabel, { color: colors.text, marginBottom: 8 }]}>More details</Text>
                  <TextInput
                    style={[styles.rowInput, { color: colors.text, textAlign: 'left', minHeight: 80, width: '100%', flex: 0 }]}
                    value={moreInfo}
                    onChangeText={setMoreInfo}
-                   placeholder="Add notes..."
+                   placeholder="Add extra information..."
                    placeholderTextColor={colors.textMuted}
                    multiline
                    maxLength={255}
@@ -617,6 +621,17 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 16,
     height: 48, // Standard row height
+  },
+  switchRow: {
+    height: 60,
+    paddingVertical: 8,
+  },
+  switchLabelContainer: {
+    flex: 1,
+  },
+  switchSubtext: {
+    fontSize: 13,
+    marginTop: 2,
   },
   rowLabel: {
     fontSize: 16,
