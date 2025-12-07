@@ -139,18 +139,18 @@ export default function MatrixScreen() {
              {distance === 'N/A' && (
                <>
                  <ThemedText style={[styles.notInMatrixText, { color: colors.textMuted }]}>
-                   Not in official matrix
+                   Not in the matrix
                  </ThemedText>
                  <ThemedText style={[styles.essClaimText, { color: colors.textMuted }]}>
-                   You are required to submit a quick claim in ESS
+                   Submit a Quick Claim in ESS
                  </ThemedText>
                  <TouchableOpacity 
-                   style={[styles.mapsButton, { backgroundColor: colors.primary }]}
                    onPress={openRouteInGoogleMaps}
-                   activeOpacity={0.8}
+                   activeOpacity={0.6}
+                   style={styles.mapsLink}
                  >
-                   <Ionicons name="map" size={18} color="#FFF" />
-                   <ThemedText style={styles.mapsButtonText}>View Route in Maps</ThemedText>
+                  <ThemedText style={[styles.mapsLinkText, { color: colors.primary }]}>View Route in Maps</ThemedText>
+                  <Ionicons name="open-outline" size={16} color={colors.primary} />
                  </TouchableOpacity>
                </>
              )}
@@ -380,18 +380,15 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     paddingHorizontal: 20,
   },
-  mapsButton: {
+  mapsLink: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-    paddingHorizontal: 20,
-    paddingVertical: 14,
-    borderRadius: 12,
+    gap: 6,
     marginTop: 8,
   },
-  mapsButtonText: {
-    color: '#FFF',
+  mapsLinkText: {
     fontSize: 15,
-    fontWeight: '600',
+    fontWeight: '500',
+    textDecorationLine: 'underline',
   },
 });
