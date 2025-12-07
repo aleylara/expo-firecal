@@ -75,6 +75,8 @@ export default function TimesheetFormModal({
   const [overtimeShift, setOvertimeShift] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [manualKmsOverride, setManualKmsOverride] = useState(false);
+  const [startTimeFocused, setStartTimeFocused] = useState(false);
+  const [finishTimeFocused, setFinishTimeFocused] = useState(false);
 
   // Station picker modals
   const [showFromStationPicker, setShowFromStationPicker] = useState(false);
@@ -345,20 +347,24 @@ export default function TimesheetFormModal({
                  label="Start Time" 
                  value={startTime} 
                  onChange={(t: string) => handleTimeInput(t, setStartTime)} 
-                 placeholder="0800" 
+                 placeholder={!startTimeFocused && !startTime ? "0800" : ""} 
                  error={startTimeError}
                  keyboardType="number-pad"
                  maxLength={5}
+                 onFocus={() => setStartTimeFocused(true)}
+                 onBlur={() => setStartTimeFocused(false)}
                  colors={colors}
                />
                <FormRow 
                  label="Finish" 
                  value={finishTime} 
                  onChange={(t: string) => handleTimeInput(t, setFinishTime)} 
-                 placeholder="1700" 
+                 placeholder={!finishTimeFocused && !finishTime ? "1700" : ""} 
                  error={finishTimeError}
                  keyboardType="number-pad"
                  maxLength={5}
+                 onFocus={() => setFinishTimeFocused(true)}
+                 onBlur={() => setFinishTimeFocused(false)}
                  colors={colors}
                />
                <FormRow 
@@ -536,6 +542,8 @@ const FormRow = ({
   readOnly = false,
   onPress,
   rightIcon,
+  onFocus,
+  onBlur,
   colors
 }: any) => (
   <View style={[styles.formRow, !isLast && { borderBottomWidth: 0.5, borderBottomColor: colors.borderLight }]}>
@@ -558,6 +566,8 @@ const FormRow = ({
         maxLength={maxLength}
         editable={!readOnly}
         textAlign="right"
+        onFocus={onFocus}
+        onBlur={onBlur}
       />
     )}
     {error ? <Text style={styles.inlineError}>{error}</Text> : null}
