@@ -14,7 +14,7 @@ import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 interface LogbookTimesheetItemProps {
   item: Timesheet;
   onPress: (date: string) => void;
-  onDelete: (date: string) => void;
+  onDelete?: (date: string) => void;
 }
 
 export const LogbookTimesheetItem = React.memo(
@@ -22,6 +22,7 @@ export const LogbookTimesheetItem = React.memo(
     const { colors, tokens } = useThemedStyles();
 
     const handleDelete = () => {
+      if (!onDelete) return;
       Alert.alert(
         'Delete Timesheet',
         'Are you sure you want to delete this timesheet entry?',
@@ -86,6 +87,16 @@ export const LogbookTimesheetItem = React.memo(
             fontWeight: '700',
             letterSpacing: 0.5,
           },
+          actionBadge: {
+            paddingHorizontal: 6,
+            paddingVertical: 2,
+            borderRadius: 4,
+            backgroundColor: colors.surfaceHighlight,
+            marginLeft: 6,
+          },
+          actionBadgeText: {
+            fontSize: 10,
+          },
           deleteButton: {
             padding: 4,
           },
@@ -94,13 +105,13 @@ export const LogbookTimesheetItem = React.memo(
     );
 
     // Format Start - Finish (Total)
-    const timeString = `${item.start_time ? formatHHMMToDisplay(item.start_time) : '?'} - ${item.finish_time ? formatHHMMToDisplay(item.finish_time) : '?'}${item.total_hours ? ` (${item.total_hours}h)` : ''}`;
+    const timeString = `${item.start_time ? formatHHMMToDisplay(item.start_time) : '?'} - ${item.finish_time ? formatHHMMToDisplay(item.finish_time) : '?'}${item.total_hours ? ` (${item.total_hours}h)` : ''}${item.stayback ? ` • Stayback: ${formatHHMMToDisplay(item.stayback)}` : ''}`;
 
     // Format To Station • Return Kms
     const routeParts = [];
     if (item.to_station) routeParts.push(item.to_station);
     if (item.return_kms) routeParts.push(`${item.return_kms} km`);
-    
+
     const routeString = routeParts.length > 0 ? routeParts.join(' • ') : null;
 
     return (
@@ -120,6 +131,11 @@ export const LogbookTimesheetItem = React.memo(
                 <Text style={styles.otBadgeText}>OT</Text>
               </View>
             )}
+            {item.action_required === 1 && (
+              <View style={styles.actionBadge}>
+                <Text style={styles.actionBadgeText}>🚩</Text>
+              </View>
+            )}
           </View>
           <TouchableOpacity
             style={styles.deleteButton}
@@ -133,13 +149,16 @@ export const LogbookTimesheetItem = React.memo(
         {/* Line 1: Time & Hours */}
         <Text style={styles.rowText}>{timeString}</Text>
 
-        {/* Line 2: Route */}
+        {/* Line 2: Leave */}
+        {item.taken_leave && <Text style={styles.rowText}>Leave: {item.taken_leave}</Text>}
+
+        {/* Line 3: Route */}
         {routeString && <Text style={styles.rowText}>{routeString}</Text>}
 
-        {/* Line 3: Notes snippet */}
-        {item.more_info ? (
+        {/* Line 4: Comments snippet */}
+        {item.comments ? (
           <Text style={styles.notesText} numberOfLines={1}>
-            {item.more_info}
+            {item.comments}
           </Text>
         ) : null}
       </TouchableOpacity>

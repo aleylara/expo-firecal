@@ -19,6 +19,7 @@ import { useDayData } from '@/hooks/notes/use-day-data';
 import { useErrorHandler } from '@/hooks/use-error-handler';
 import { useThemedStyles } from '@/hooks/use-themed-styles';
 import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
@@ -47,6 +48,7 @@ export default function DayEntryModal({
   } = useDayData(date);
   const { triggerRefresh } = useNotesRefresh();
   const notify = useNotify();
+  const router = useRouter();
 
   const [noteEditorVisible, setNoteEditorVisible] = useState(false);
   const [timesheetEditorVisible, setTimesheetEditorVisible] = useState(false);
@@ -66,6 +68,9 @@ export default function DayEntryModal({
         onSaveComplete();
       }
 
+      // Redirect to Logbook Notes tab
+      router.push('/(tabs)/logbook?tab=notes');
+
       setTimeout(() => {
         triggerRefresh();
       }, 300);
@@ -79,6 +84,9 @@ export default function DayEntryModal({
       await deleteNote();
       notify.success('Deleted', 'Note deleted');
       setNoteEditorVisible(false);
+
+      // Close the main modal so user falls back to calendar
+      onClose();
 
       setTimeout(() => {
         triggerRefresh();
@@ -100,6 +108,9 @@ export default function DayEntryModal({
         onSaveComplete();
       }
 
+      // Redirect to Logbook Timesheet tab
+      router.push('/(tabs)/logbook?tab=timesheet');
+
       setTimeout(() => {
         triggerRefresh();
       }, 300);
@@ -112,18 +123,24 @@ export default function DayEntryModal({
     try {
       await deleteTimesheet();
       notify.success('Deleted', 'Timesheet deleted');
+      
+      // Close local editor state
       setTimesheetEditorVisible(false);
 
+      // Close the main modal so user falls back to calendar and sees the toast
+      onClose();
+
+      // Trigger refresh after closing
       setTimeout(() => {
         triggerRefresh();
       }, 300);
     } catch (error) {
-      throw error;
+      notify.error('Error', 'Failed to delete timesheet');
     }
   };
 
   const hasNote = note && note.content && note.content.trim().length > 0;
-  
+
   const styles = StyleSheet.create({
     overlay: {
       flex: 1,
@@ -237,19 +254,19 @@ export default function DayEntryModal({
 
             {/* List Content */}
             <ScrollView contentContainerStyle={styles.list}>
-              
+
               {/* Note Section */}
               <View>
                 <Text style={styles.sectionTitle}>Daily Note</Text>
-                <TouchableOpacity 
-                  style={[styles.card, !hasNote && styles.emptyCard]} 
+                <TouchableOpacity
+                  style={[styles.card, !hasNote && styles.emptyCard]}
                   onPress={() => setNoteEditorVisible(true)}
                   activeOpacity={0.7}
                 >
-                  <Ionicons 
-                    name={hasNote ? "document-text" : "add-circle-outline"} 
-                    size={24} 
-                    color={hasNote ? colors.primary : colors.textMuted} 
+                  <Ionicons
+                    name={hasNote ? "document-text" : "add-circle-outline"}
+                    size={24}
+                    color={hasNote ? colors.primary : colors.textMuted}
                   />
                   <View style={styles.cardContent}>
                     {hasNote ? (
@@ -268,15 +285,15 @@ export default function DayEntryModal({
               {/* Timesheet Section */}
               <View>
                 <Text style={styles.sectionTitle}>Timesheet</Text>
-                <TouchableOpacity 
-                  style={[styles.card, !timesheet && styles.emptyCard]} 
+                <TouchableOpacity
+                  style={[styles.card, !timesheet && styles.emptyCard]}
                   onPress={() => setTimesheetEditorVisible(true)}
                   activeOpacity={0.7}
                 >
-                  <Ionicons 
-                    name={timesheet ? "time" : "add-circle-outline"} 
-                    size={24} 
-                    color={timesheet ? colors.primary : colors.textMuted} 
+                  <Ionicons
+                    name={timesheet ? "time" : "add-circle-outline"}
+                    size={24}
+                    color={timesheet ? colors.primary : colors.textMuted}
                   />
                   <View style={styles.cardContent}>
                     {timesheet ? (
@@ -288,21 +305,41 @@ export default function DayEntryModal({
                               <Text style={{ fontSize: 10, fontWeight: '700', color: colors.warning }}>OT</Text>
                             </View>
                           )}
+                          {timesheet.action_required === 1 && (
+                            <View style={{ backgroundColor: colors.surfaceHighlight, paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 }}>
+                              <Text style={{ fontSize: 10 }}>🚩</Text>
+                            </View>
+                          )}
                         </View>
                         <View>
                           {/* Time & Hours */}
                           {timesheet.start_time && timesheet.finish_time && (
-                             <Text style={styles.cardSubtitle}>
-                               {timesheet.start_time.substring(0, 2)}:{timesheet.start_time.substring(2)} - {timesheet.finish_time.substring(0, 2)}:{timesheet.finish_time.substring(2)}
-                               {timesheet.total_hours ? ` • ${timesheet.total_hours}h` : ''}
-                             </Text>
+                            <Text style={styles.cardSubtitle}>
+                              {timesheet.start_time.substring(0, 2)}:{timesheet.start_time.substring(2)} - {timesheet.finish_time.substring(0, 2)}:{timesheet.finish_time.substring(2)}
+                              {timesheet.total_hours ? ` • ${timesheet.total_hours}h` : ''}
+                              {timesheet.stayback ? ` • Stayback: ${timesheet.stayback.substring(0, 2)}:${timesheet.stayback.substring(2)}` : ''}
+                            </Text>
                           )}
-                          
+
+                          {/* Leave */}
+                          {timesheet.taken_leave && (
+                            <Text style={styles.cardSubtitle}>
+                              Leave: {timesheet.taken_leave}
+                            </Text>
+                          )}
+
                           {/* Destination & Kms */}
                           {(timesheet.to_station || timesheet.return_kms) && (
                             <Text style={styles.cardSubtitle}>
-                              {timesheet.to_station ? timesheet.to_station : 'No Destination'} 
+                              {timesheet.to_station ? timesheet.to_station : 'No Destination'}
                               {timesheet.return_kms ? ` • ${timesheet.return_kms}km` : ''}
+                            </Text>
+                          )}
+
+                          {/* Comments */}
+                          {timesheet.comments && (
+                            <Text style={styles.cardSubtitle} numberOfLines={2}>
+                              {timesheet.comments}
                             </Text>
                           )}
                         </View>

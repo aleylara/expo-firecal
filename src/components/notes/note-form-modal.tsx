@@ -178,16 +178,8 @@ export default function NoteFormModal({
             />
           </ScrollView>
 
-          {/* Minimalist Footer */}
+          {/* Footer with char counter */}
           <View style={[styles.footer, { borderTopColor: colors.borderLight }]}>
-             <View style={{ flex: 1 }}>
-               {note && onDelete && (
-                <TouchableOpacity onPress={handleDelete} style={styles.iconButton}>
-                  <Ionicons name="trash-outline" size={22} color={colors.error} />
-                </TouchableOpacity>
-              )}
-             </View>
-             
              <Text
                 style={[
                   styles.charCounter,
@@ -197,6 +189,18 @@ export default function NoteFormModal({
                 {charCount} / {MAX_CHARS}
               </Text>
           </View>
+
+          {/* Delete Button */}
+          {note && onDelete && (
+            <View style={{ paddingHorizontal: 16, paddingBottom: 16 }}>
+              <TouchableOpacity 
+                onPress={handleDelete} 
+                style={[styles.deleteButton, { backgroundColor: colors.surfaceElevated }]}
+              >
+                <Text style={{ color: colors.error, fontSize: 17, fontWeight: '500' }}>Delete Entry</Text>
+              </TouchableOpacity>
+            </View>
+          )}
 
         </KeyboardAvoidingView>
       </SafeAreaView>
@@ -244,19 +248,19 @@ const styles = StyleSheet.create({
     padding: 0, // Remove default padding
   },
   footer: {
-    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderTopWidth: 0.5,
   },
-  iconButton: {
-    padding: 8,
-    marginLeft: -8,
-  },
   charCounter: {
     fontSize: 13,
     fontVariant: ['tabular-nums'],
+  },
+  deleteButton: {
+    padding: 16,
+    alignItems: 'center',
+    borderRadius: 12,
   },
 });
