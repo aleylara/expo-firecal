@@ -20,6 +20,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useMemo, useState } from 'react';
 import {
   Alert,
+  Keyboard,
   KeyboardAvoidingView,
   Modal,
   Platform,
@@ -29,6 +30,7 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
+  TouchableWithoutFeedback,
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -307,7 +309,7 @@ export default function TimesheetFormModal({
       timesheet.start_time !== null ||
       timesheet.finish_time !== null ||
       timesheet.more_info !== null);
-  
+
   return (
     <Modal
       visible={visible}
@@ -315,107 +317,108 @@ export default function TimesheetFormModal({
       presentationStyle="pageSheet"
       onRequestClose={onClose}
     >
-      <SafeAreaView
-        style={[common.container, { backgroundColor: colors.background }]}
-        edges={['top']}
-      >
-        <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          style={{ flex: 1 }}
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <SafeAreaView
+          style={[common.container, { backgroundColor: colors.background }]}
+          edges={['top']}
         >
-          {/* Header */}
-          <View style={[styles.header, { borderBottomColor: colors.borderLight }]}>
-             <TouchableOpacity onPress={onClose} style={styles.headerButton}>
-               <Text style={[styles.headerButtonText, { color: colors.primary }]}>Cancel</Text>
-             </TouchableOpacity>
-             <Text style={[styles.headerTitle, { color: colors.text }]}>
-                {date ? formatDateString(date, 'EEE, d MMM') : 'New Entry'}
-             </Text>
-             <TouchableOpacity onPress={handleSave} style={styles.headerButton} disabled={isSaving}>
-               <Text style={[styles.headerButtonText, { color: colors.primary, fontWeight: '700' }]}>Done</Text>
-             </TouchableOpacity>
-          </View>
-
-          <ScrollView
-            style={styles.content}
-            keyboardShouldPersistTaps="handled"
-            contentContainerStyle={{ paddingBottom: 40 }}
+          <KeyboardAvoidingView
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            style={{ flex: 1 }}
           >
-            {/* Shift Time Group */}
-            <FormGroup title="Shift Details" colors={colors}>
-               <FormRow 
-                 label="Start Time" 
-                 value={startTime} 
-                 onChange={(t: string) => handleTimeInput(t, setStartTime)} 
-                 placeholder={!startTimeFocused && !startTime ? "0800" : ""} 
-                 error={startTimeError}
-                 keyboardType="number-pad"
-                 maxLength={5}
-                 onFocus={() => setStartTimeFocused(true)}
-                 onBlur={() => setStartTimeFocused(false)}
-                 colors={colors}
-               />
-               <FormRow 
-                 label="Finish" 
-                 value={finishTime} 
-                 onChange={(t: string) => handleTimeInput(t, setFinishTime)} 
-                 placeholder={!finishTimeFocused && !finishTime ? "1700" : ""} 
-                 error={finishTimeError}
-                 keyboardType="number-pad"
-                 maxLength={5}
-                 onFocus={() => setFinishTimeFocused(true)}
-                 onBlur={() => setFinishTimeFocused(false)}
-                 colors={colors}
-               />
-               <FormRow 
-                 label="Total Hours" 
-                 value={totalHours} 
-                 onChange={setTotalHours} 
-                 placeholder="Auto" 
-                 error={hoursError}
-                 keyboardType="decimal-pad"
-                 isLast
-                 colors={colors}
-               />
-            </FormGroup>
+            {/* Header */}
+            <View style={[styles.header, { borderBottomColor: colors.borderLight }]}>
+              <TouchableOpacity onPress={onClose} style={styles.headerButton}>
+                <Text style={[styles.headerButtonText, { color: colors.primary }]}>Cancel</Text>
+              </TouchableOpacity>
+              <Text style={[styles.headerTitle, { color: colors.text }]}>
+                {date ? formatDateString(date, 'EEE, d MMM') : 'New Entry'}
+              </Text>
+              <TouchableOpacity onPress={handleSave} style={styles.headerButton} disabled={isSaving}>
+                <Text style={[styles.headerButtonText, { color: colors.primary, fontWeight: '700' }]}>Done</Text>
+              </TouchableOpacity>
+            </View>
 
-            {/* Location Group */}
-            <FormGroup title="Travel & Location" colors={colors}>
-               <FormRow 
-                 label="From" 
-                 value={fromStation} 
-                 onPress={() => setShowFromStationPicker(true)}
-                 placeholder="Select"
-                 rightIcon="chevron-forward"
-                 colors={colors}
-               />
-               <FormRow 
-                 label="To" 
-                 value={toStation} 
-                 onPress={() => setShowToStationPicker(true)}
-                 placeholder="Select"
-                 rightIcon="chevron-forward"
-                 colors={colors}
-               />
-               <FormRow 
-                 label="Return Kms" 
-                 value={returnKms} 
-                 onChange={(t: string) => { setReturnKms(t); setManualKmsOverride(true); }}
-                 placeholder="Auto" 
-                 error={kmsError}
-                 keyboardType="numeric"
-                 isLast
-                 colors={colors}
-               />
-            </FormGroup>
+            <ScrollView
+              style={styles.content}
+              keyboardShouldPersistTaps="handled"
+              contentContainerStyle={{ paddingBottom: 40 }}
+            >
+              {/* Shift Time Group */}
+              <FormGroup title="Shift Details" colors={colors}>
+                <FormRow
+                  label="Start Time"
+                  value={startTime}
+                  onChange={(t: string) => handleTimeInput(t, setStartTime)}
+                  placeholder={!startTimeFocused && !startTime ? "0800" : ""}
+                  error={startTimeError}
+                  keyboardType="number-pad"
+                  maxLength={5}
+                  onFocus={() => setStartTimeFocused(true)}
+                  onBlur={() => setStartTimeFocused(false)}
+                  colors={colors}
+                />
+                <FormRow
+                  label="Finish"
+                  value={finishTime}
+                  onChange={(t: string) => handleTimeInput(t, setFinishTime)}
+                  placeholder={!finishTimeFocused && !finishTime ? "1700" : ""}
+                  error={finishTimeError}
+                  keyboardType="number-pad"
+                  maxLength={5}
+                  onFocus={() => setFinishTimeFocused(true)}
+                  onBlur={() => setFinishTimeFocused(false)}
+                  colors={colors}
+                />
+                <FormRow
+                  label="Total Hours"
+                  value={totalHours}
+                  onChange={setTotalHours}
+                  placeholder="Auto"
+                  error={hoursError}
+                  keyboardType="decimal-pad"
+                  isLast
+                  colors={colors}
+                />
+              </FormGroup>
 
-            {/* Other Details Group */}
-            <FormGroup title="Additional Info" colors={colors}>
-               <View style={[styles.formRow, styles.switchRow, { borderBottomWidth: 0.5, borderBottomColor: colors.borderLight }]}>
-                 <View style={styles.switchLabelContainer}>
-                   <Text style={[styles.rowLabel, { color: colors.text }]}>Overtime</Text>
-                 </View>
-                 <Switch
+              {/* Location Group */}
+              <FormGroup title="Travel & Location" colors={colors}>
+                <FormRow
+                  label="From"
+                  value={fromStation}
+                  onPress={() => setShowFromStationPicker(true)}
+                  placeholder="Select"
+                  rightIcon="chevron-forward"
+                  colors={colors}
+                />
+                <FormRow
+                  label="To"
+                  value={toStation}
+                  onPress={() => setShowToStationPicker(true)}
+                  placeholder="Select"
+                  rightIcon="chevron-forward"
+                  colors={colors}
+                />
+                <FormRow
+                  label="Return Kms"
+                  value={returnKms}
+                  onChange={(t: string) => { setReturnKms(t); setManualKmsOverride(true); }}
+                  placeholder="Auto"
+                  error={kmsError}
+                  keyboardType="numeric"
+                  isLast
+                  colors={colors}
+                />
+              </FormGroup>
+
+              {/* Other Details Group */}
+              <FormGroup title="Additional Info" colors={colors}>
+                <View style={[styles.formRow, styles.switchRow, { borderBottomWidth: 0.5, borderBottomColor: colors.borderLight }]}>
+                  <View style={styles.switchLabelContainer}>
+                    <Text style={[styles.rowLabel, { color: colors.text }]}>Overtime</Text>
+                  </View>
+                  <Switch
                     value={overtimeShift}
                     onValueChange={setOvertimeShift}
                     trackColor={{ false: colors.borderStrong, true: colors.success }}
@@ -423,103 +426,104 @@ export default function TimesheetFormModal({
                     ios_backgroundColor={colors.borderStrong}
                     style={{ transform: [{ scaleX: 1.1 }, { scaleY: 1.1 }] }}
                   />
-               </View>
-               <FormRow 
-                 label="Taken Leave" 
-                 value={takenLeave} 
-                 onChange={setTakenLeave} 
-                 placeholder="e.g. 2Hrs CL" 
-                 colors={colors}
-               />
+                </View>
+                <FormRow
+                  label="Taken Leave"
+                  value={takenLeave}
+                  onChange={setTakenLeave}
+                  placeholder="e.g. 2Hrs CL"
+                  colors={colors}
+                />
                 <View style={[styles.formRow, { height: 'auto', flexDirection: 'column', alignItems: 'flex-start', paddingTop: 12, paddingBottom: 12 }]}>
-                 <Text style={[styles.rowLabel, { color: colors.text, marginBottom: 8 }]}>More details</Text>
-                 <TextInput
-                   style={[styles.rowInput, { color: colors.text, textAlign: 'left', minHeight: 80, width: '100%', flex: 0 }]}
-                   value={moreInfo}
-                   onChangeText={setMoreInfo}
-                   placeholder="Add extra information..."
-                   placeholderTextColor={colors.textMuted}
-                   multiline
-                   maxLength={255}
-                   textAlignVertical="top"
-                 />
-                 {moreInfoError ? <Text style={styles.inlineError}>{moreInfoError}</Text> : null}
-               </View>
-            </FormGroup>
+                  <Text style={[styles.rowLabel, { color: colors.text, marginBottom: 8 }]}>More details</Text>
+                  <TextInput
+                    style={[styles.rowInput, { color: colors.text, textAlign: 'left', minHeight: 80, width: '100%', flex: 0 }]}
+                    value={moreInfo}
+                    onChangeText={setMoreInfo}
+                    placeholder="Add extra information..."
+                    placeholderTextColor={colors.textMuted}
+                    multiline
+                    maxLength={255}
+                    textAlignVertical="top"
+                  />
+                  {moreInfoError ? <Text style={styles.inlineError}>{moreInfoError}</Text> : null}
+                </View>
+              </FormGroup>
 
-            {/* Delete Button */}
-            {hasTimesheetData && onDelete && (
-               <TouchableOpacity onPress={handleDelete} style={[styles.deleteButton, { backgroundColor: colors.surfaceElevated }]}>
+              {/* Delete Button */}
+              {hasTimesheetData && onDelete && (
+                <TouchableOpacity onPress={handleDelete} style={[styles.deleteButton, { backgroundColor: colors.surfaceElevated }]}>
                   <Text style={{ color: colors.error, fontSize: 17, fontWeight: '500' }}>Delete Entry</Text>
-               </TouchableOpacity>
-            )}
-
-          </ScrollView>
-        </KeyboardAvoidingView>
-
-        {/* Reuse existing Modal logic for Pickers */}
-        {/* From Station Picker Modal */}
-        <Modal
-          visible={showFromStationPicker}
-          animationType="fade"
-          transparent={true}
-          onRequestClose={() => setShowFromStationPicker(false)}
-        >
-          <View style={styles.pickerModalOverlay}>
-            <View style={[styles.pickerModalContent, { backgroundColor: colors.surface }]}>
-              <View style={[styles.pickerModalHeader, { borderBottomColor: colors.borderLight }]}>
-                <Text style={[styles.pickerModalTitle, { color: colors.text }]}>From Station</Text>
-                <TouchableOpacity onPress={() => setShowFromStationPicker(false)}>
-                  <Text style={{ color: colors.primary, fontSize: 16 }}>Done</Text>
                 </TouchableOpacity>
-              </View>
-              <ScrollView style={styles.pickerStationList} removeClippedSubviews>
-                {stations.map(([label, value]) => (
-                  <TouchableOpacity
-                    key={value}
-                    style={[styles.pickerStationItem, { borderBottomColor: colors.borderLight }, fromStation === label && { backgroundColor: colors.surfaceElevated }]}
-                    onPress={() => { setFromStation(label); setShowFromStationPicker(false); }}
-                  >
-                    <Text style={[styles.pickerStationText, { color: colors.text }]}>{label}</Text>
-                    {fromStation === label && <Ionicons name="checkmark" size={20} color={colors.primary} />}
-                  </TouchableOpacity>
-                ))}
-              </ScrollView>
-            </View>
-          </View>
-        </Modal>
+              )}
 
-        {/* To Station Picker Modal */}
-        <Modal
-          visible={showToStationPicker}
-          animationType="fade"
-          transparent={true}
-          onRequestClose={() => setShowToStationPicker(false)}
-        >
-          <View style={styles.pickerModalOverlay}>
-            <View style={[styles.pickerModalContent, { backgroundColor: colors.surface }]}>
-              <View style={[styles.pickerModalHeader, { borderBottomColor: colors.borderLight }]}>
-                 <Text style={[styles.pickerModalTitle, { color: colors.text }]}>To Station</Text>
-                <TouchableOpacity onPress={() => setShowToStationPicker(false)}>
-                  <Text style={{ color: colors.primary, fontSize: 16 }}>Done</Text>
-                </TouchableOpacity>
-              </View>
-              <ScrollView style={styles.pickerStationList} removeClippedSubviews>
-                {stations.map(([label, value]) => (
-                  <TouchableOpacity
-                    key={value}
-                    style={[styles.pickerStationItem, { borderBottomColor: colors.borderLight }, toStation === label && { backgroundColor: colors.surfaceElevated }]}
-                    onPress={() => { setToStation(label); setShowToStationPicker(false); }}
-                  >
-                    <Text style={[styles.pickerStationText, { color: colors.text }]}>{label}</Text>
-                    {toStation === label && <Ionicons name="checkmark" size={20} color={colors.primary} />}
+            </ScrollView>
+          </KeyboardAvoidingView>
+
+          {/* Reuse existing Modal logic for Pickers */}
+          {/* From Station Picker Modal */}
+          <Modal
+            visible={showFromStationPicker}
+            animationType="fade"
+            transparent={true}
+            onRequestClose={() => setShowFromStationPicker(false)}
+          >
+            <View style={styles.pickerModalOverlay}>
+              <View style={[styles.pickerModalContent, { backgroundColor: colors.surface }]}>
+                <View style={[styles.pickerModalHeader, { borderBottomColor: colors.borderLight }]}>
+                  <Text style={[styles.pickerModalTitle, { color: colors.text }]}>From Station</Text>
+                  <TouchableOpacity onPress={() => setShowFromStationPicker(false)}>
+                    <Text style={{ color: colors.primary, fontSize: 16 }}>Done</Text>
                   </TouchableOpacity>
-                ))}
-              </ScrollView>
+                </View>
+                <ScrollView style={styles.pickerStationList} removeClippedSubviews>
+                  {stations.map(([label, value]) => (
+                    <TouchableOpacity
+                      key={value}
+                      style={[styles.pickerStationItem, { borderBottomColor: colors.borderLight }, fromStation === label && { backgroundColor: colors.surfaceElevated }]}
+                      onPress={() => { setFromStation(label); setShowFromStationPicker(false); }}
+                    >
+                      <Text style={[styles.pickerStationText, { color: colors.text }]}>{label}</Text>
+                      {fromStation === label && <Ionicons name="checkmark" size={20} color={colors.primary} />}
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+              </View>
             </View>
-          </View>
-        </Modal>
-      </SafeAreaView>
+          </Modal>
+
+          {/* To Station Picker Modal */}
+          <Modal
+            visible={showToStationPicker}
+            animationType="fade"
+            transparent={true}
+            onRequestClose={() => setShowToStationPicker(false)}
+          >
+            <View style={styles.pickerModalOverlay}>
+              <View style={[styles.pickerModalContent, { backgroundColor: colors.surface }]}>
+                <View style={[styles.pickerModalHeader, { borderBottomColor: colors.borderLight }]}>
+                  <Text style={[styles.pickerModalTitle, { color: colors.text }]}>To Station</Text>
+                  <TouchableOpacity onPress={() => setShowToStationPicker(false)}>
+                    <Text style={{ color: colors.primary, fontSize: 16 }}>Done</Text>
+                  </TouchableOpacity>
+                </View>
+                <ScrollView style={styles.pickerStationList} removeClippedSubviews>
+                  {stations.map(([label, value]) => (
+                    <TouchableOpacity
+                      key={value}
+                      style={[styles.pickerStationItem, { borderBottomColor: colors.borderLight }, toStation === label && { backgroundColor: colors.surfaceElevated }]}
+                      onPress={() => { setToStation(label); setShowToStationPicker(false); }}
+                    >
+                      <Text style={[styles.pickerStationText, { color: colors.text }]}>{label}</Text>
+                      {toStation === label && <Ionicons name="checkmark" size={20} color={colors.primary} />}
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+              </View>
+            </View>
+          </Modal>
+        </SafeAreaView>
+      </TouchableWithoutFeedback>
     </Modal>
   );
 }
@@ -534,12 +538,12 @@ const FormGroup = ({ title, children, colors }: { title: string; children: React
   </View>
 );
 
-const FormRow = ({ 
-  label, 
-  value, 
-  onChange, 
-  placeholder, 
-  error, 
+const FormRow = ({
+  label,
+  value,
+  onChange,
+  placeholder,
+  error,
   keyboardType = 'default',
   isLast = false,
   maxLength,
@@ -554,7 +558,7 @@ const FormRow = ({
     <Text style={[styles.rowLabel, { color: colors.text }]} numberOfLines={1}>{label}</Text>
     {onPress ? (
       <TouchableOpacity onPress={onPress} style={{ flex: 1, flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center' }}>
-         <Text style={[styles.rowValue, { color: value ? colors.text : colors.textMuted }]}>
+        <Text style={[styles.rowValue, { color: value ? colors.text : colors.textMuted }]}>
           {value || placeholder}
         </Text>
         {rightIcon && <Ionicons name={rightIcon} size={16} color={colors.textMuted} style={{ marginLeft: 4 }} />}
@@ -650,11 +654,11 @@ const styles = StyleSheet.create({
     textAlign: 'right',
   },
   inlineError: {
-    color: 'red', 
-    fontSize: 11, 
-    position: 'absolute', 
-    bottom: 2, 
-    right: 16 
+    color: 'red',
+    fontSize: 11,
+    position: 'absolute',
+    bottom: 2,
+    right: 16
   },
   deleteButton: {
     alignItems: 'center',
