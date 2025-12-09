@@ -34,7 +34,9 @@ export interface Timesheet {
   return_kms: number | null;
   start_time: string | null;
   finish_time: string | null;
-  more_info: string | null;
+  comments: string | null;
+  action_required: number; // 0 or 1
+  stayback: string | null; // HHMM format
   created_at: string;
   updated_at: string;
 }
@@ -48,7 +50,9 @@ export interface CreateTimesheetInput {
   return_kms?: number | null;
   start_time?: string | null;
   finish_time?: string | null;
-  more_info?: string | null;
+  comments?: string | null;
+  action_required?: boolean;
+  stayback?: string | null;
 }
 
 export interface UpdateTimesheetInput {
@@ -60,7 +64,9 @@ export interface UpdateTimesheetInput {
   return_kms?: number | null;
   start_time?: string | null;
   finish_time?: string | null;
-  more_info?: string | null;
+  comments?: string | null;
+  action_required?: boolean;
+  stayback?: string | null;
 }
 
 // Combined types
