@@ -113,7 +113,7 @@ export async function generateDummyData(
           return_kms: Math.floor(Math.random() * 50),
           start_time: startTime,
           finish_time: finishTime,
-          more_info: Math.random() < 0.5 ? 'Generated shift data' : null,
+          comments: Math.random() < 0.5 ? 'Generated shift data' : null,
         });
       }
       usedTimesheetDates.add(dateStr);

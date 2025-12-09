@@ -85,28 +85,32 @@ export function generateNotesCSV(notes: Note[]): string {
 export function generateTimesheetsCSV(timesheets: Timesheet[]): string {
   const headers = [
     'Date',
+    'Overtime',
     'Start Time',
     'Finish Time',
     'Total Hours',
     'From Station',
     'To Station',
     'Return KMs',
-    'Overtime',
+    'Stayback',
     'Taken Leave',
-    'More Info',
+    'Action Required',
+    'Comments',
   ];
 
   const rows = timesheets.map((ts) => [
     escapeCSV(formatDate(ts.date)),
+    escapeCSV(ts.overtime_shift === 1 ? 'OT' : ''),
     escapeCSV(formatTime(ts.start_time)),
     escapeCSV(formatTime(ts.finish_time)),
     escapeCSV(ts.total_hours),
     escapeCSV(ts.from_station),
     escapeCSV(ts.to_station),
     escapeCSV(ts.return_kms),
-    escapeCSV(ts.overtime_shift === 1 ? 'Yes' : 'No'),
+    escapeCSV(formatTime(ts.stayback)),
     escapeCSV(ts.taken_leave),
-    escapeCSV(ts.more_info),
+    escapeCSV(ts.action_required === 1 ? 'Check' : ''),
+    escapeCSV(ts.comments),
   ]);
 
   return [headers.join(','), ...rows.map((row) => row.join(','))].join('\n');
@@ -147,9 +151,17 @@ export function generateTimesheetsTXT(
     lines.push(`From Station: ${ts.from_station || ''}`);
     lines.push(`To Station: ${ts.to_station || ''}`);
     lines.push(`Return KMs: ${ts.return_kms || ''}`);
-    lines.push(`Overtime: ${ts.overtime_shift === 1 ? 'Yes' : 'No'}`);
+    if (ts.stayback) {
+      lines.push(`Stayback: ${formatTime(ts.stayback)}`);
+    }
+    if (ts.overtime_shift === 1) {
+      lines.push(`Overtime: OT`);
+    }
     lines.push(`Taken Leave: ${ts.taken_leave || ''}`);
-    lines.push(`More Info: ${ts.more_info || ''}`);
+    if (ts.action_required === 1) {
+      lines.push(`Action Required: Check`);
+    }
+    lines.push(`Comments: ${ts.comments || ''}`);
     lines.push('');
   });
 

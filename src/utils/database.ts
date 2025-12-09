@@ -39,7 +39,9 @@ export async function initializeDatabase(db: SQLite.SQLiteDatabase) {
       return_kms REAL,
       start_time TEXT,
       finish_time TEXT,
-      more_info TEXT,
+      comments TEXT,
+      action_required INTEGER DEFAULT 0,
+      stayback TEXT,
       created_at TEXT NOT NULL,
       updated_at TEXT NOT NULL
     );

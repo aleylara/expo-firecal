@@ -125,6 +125,17 @@ export class SafeStorage {
     }
   }
 
+  static async clearAll(): Promise<boolean> {
+    try {
+      const keys = Object.values(STORAGE_KEYS);
+      await AsyncStorage.multiRemove(keys);
+      return true;
+    } catch (error) {
+      console.error('AsyncStorage clearAll failed:', error);
+      return false;
+    }
+  }
+
   private static isValidUserGroup(group: any): boolean {
     return (
       group &&
@@ -142,4 +153,5 @@ export const STORAGE_KEYS = {
   THEME_MODE: '@theme_mode',
   USER_GROUP: '@user_group',
   FIRST_TIME: '@first_time_setup',
+  ONBOARDING: '@onboarding_completed',
 } as const;
