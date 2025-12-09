@@ -5,6 +5,7 @@
  * Wraps expo-sqlite to provide async CRUD methods for Notes and Timesheets.
  * Memoized to ensure stable references for consuming components.
  */
+import { initializeDatabase } from '@/utils/database';
 import { getCurrentTimestamp } from '@/constants/timezone';
 import type {
   CreateNoteInput,
@@ -100,6 +101,7 @@ interface DatabaseContextType {
   // Bulk operations
   deleteNotesByYear: (year: number) => Promise<number>;
   deleteTimesheetsByYear: (year: number) => Promise<number>;
+  resetDatabase: () => Promise<void>;
 }
 
 const DatabaseContext = createContext<DatabaseContextType | null>(null);
@@ -205,9 +207,10 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
         `INSERT INTO timesheets (
           id, date, overtime_shift, total_hours, taken_leave,
           from_station, to_station, return_kms,
-          start_time, finish_time, more_info,
+          start_time, finish_time, comments, action_required,
+          stayback,
           created_at, updated_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
           id,
           date,
@@ -219,7 +222,9 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
           data.return_kms || null,
           data.start_time || null,
           data.finish_time || null,
-          data.more_info || null,
+          data.comments || null,
+          data.action_required ? 1 : 0,
+          data.stayback || null,
           now,
           now,
         ],
@@ -247,7 +252,14 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
         return_kms: data.return_kms,
         start_time: data.start_time,
         finish_time: data.finish_time,
-        more_info: data.more_info,
+        comments: data.comments,
+        action_required:
+          data.action_required !== undefined
+            ? data.action_required
+              ? 1
+              : 0
+            : undefined,
+        stayback: data.stayback,
       };
 
       const { sql, values } = buildUpdateQuery(
@@ -291,14 +303,30 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
         has_timesheet: number;
       }>(
         `SELECT 
-          COALESCE(n.date, t.date) as date,
-          CASE WHEN n.content IS NOT NULL AND LENGTH(TRIM(n.content)) > 0 THEN 1 ELSE 0 END as has_note,
-          CASE WHEN t.id IS NOT NULL THEN 1 ELSE 0 END as has_timesheet
-        FROM notes n
-        FULL OUTER JOIN timesheets t ON n.date = t.date
-        WHERE COALESCE(n.date, t.date) >= ? AND COALESCE(n.date, t.date) <= ?`,
-        [startDate, endDate],
+          date,
+          MAX(has_note) as has_note,
+          MAX(has_timesheet) as has_timesheet
+        FROM (
+          SELECT 
+            date, 
+            CASE WHEN content IS NOT NULL AND LENGTH(TRIM(content)) > 0 THEN 1 ELSE 0 END as has_note, 
+            0 as has_timesheet 
+          FROM notes
+          WHERE date >= ? AND date <= ?
+          
+          UNION ALL
+          
+          SELECT 
+            date, 
+            0 as has_note, 
+            1 as has_timesheet 
+          FROM timesheets
+          WHERE date >= ? AND date <= ?
+        )
+        GROUP BY date`,
+        [startDate, endDate, startDate, endDate],
       );
+
 
       const indicators = new Map<string, DayIndicators>();
       results.forEach(({ date, has_note, has_timesheet }) => {
@@ -437,6 +465,14 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
       return result.changes;
     };
 
+    // Reset database
+    const resetDatabase = async (): Promise<void> => {
+      await db.execAsync(
+        'DROP TABLE IF EXISTS notes; DROP TABLE IF EXISTS timesheets;',
+      );
+      await initializeDatabase(db);
+    };
+
     return {
       getNote,
       getNoteById,
@@ -460,6 +496,7 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
       getAvailableYears,
       deleteNotesByYear,
       deleteTimesheetsByYear,
+      resetDatabase,
     };
   }, [db]);
 
