@@ -183,6 +183,7 @@ export default function MainCalendar({
           bounces={true}
           removeClippedSubviews={false}
           alwaysBounceVertical={true}
+          extraData={monthIndicators}
         />
       </View>
     </SafeAreaView>
