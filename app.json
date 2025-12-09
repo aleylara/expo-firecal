@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "expo-firecal",
-    "slug": "expo-firecal",
+    "name": "FireCal",
+    "slug": "firecal",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/app-icon.png",
