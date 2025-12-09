@@ -62,7 +62,7 @@ export const Colors = {
 
     // Component specific
     surfaceTrack: warm(92), // Segmented control/input track
-    switchThumb: warm(60), // Switch thumb color
+    switchThumb: warm(80), // Switch thumb color
 
     // Overlays
     overlay: 'rgba(0, 0, 0, 0.5)', // Modal backdrop
