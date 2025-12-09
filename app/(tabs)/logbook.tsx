@@ -14,15 +14,17 @@ import { ThemedText } from '@/components/theme/themed-text';
 import { ThemedView } from '@/components/theme/themed-view';
 import { getCurrentDateInTimezone } from '@/constants/timezone';
 import { useDatabase } from '@/contexts/notes/database-context';
+import { useNotesRefresh } from '@/contexts/notes/notes-refresh-context';
 import { useNotify } from '@/contexts/notification-context';
 import { useSubscription } from '@/contexts/subscription/subscription-context';
 import { useLogbookData } from '@/hooks/notes/use-logbook-data';
 import { useThemedStyles } from '@/hooks/use-themed-styles';
 import { type Note } from '@/types/notes';
 import { type ExportFormat } from '@/utils/export-data';
+
 import { Ionicons } from '@expo/vector-icons';
-import { useFocusEffect } from '@react-navigation/native';
-import React, { useCallback, useMemo, useState } from 'react';
+import { useFocusEffect, useLocalSearchParams } from 'expo-router';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -47,6 +49,7 @@ const tabOptions: {
 
 export default function LogsScreen() {
   const { colors, tokens } = useThemedStyles();
+  const params = useLocalSearchParams<{ tab?: TabType }>();
 
   const styles = useMemo(
     () =>
@@ -175,6 +178,13 @@ export default function LogsScreen() {
   const currentYear = getCurrentDateInTimezone().getFullYear();
   const [selectedYear, setSelectedYear] = useState(currentYear);
   const [activeTab, setActiveTab] = useState<TabType>('notes');
+
+  // Sync tab with params
+  useEffect(() => {
+    if (params.tab && (params.tab === 'notes' || params.tab === 'timesheet')) {
+      setActiveTab(params.tab);
+    }
+  }, [params.tab]);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [noteEditorVisible, setNoteEditorVisible] = useState(false);
   const [timesheetEditorVisible, setTimesheetEditorVisible] = useState(false);
@@ -191,6 +201,7 @@ export default function LogsScreen() {
     exportLogbookData,
   } = useLogbookData(selectedYear);
   const db = useDatabase();
+  const { triggerRefresh: triggerCalendarRefresh } = useNotesRefresh();
   const notify = useNotify();
   const { hasFireCalPro, presentPaywall } = useSubscription();
   const [isExporting, setIsExporting] = useState(false);
@@ -222,9 +233,39 @@ export default function LogsScreen() {
     }
   };
 
+  const handleDeleteNote = async (date: string) => {
+    const noteToDelete = notes.find((n) => n.date === date);
+    if (!noteToDelete) return;
+
+    try {
+      await db.deleteNote(noteToDelete.id);
+      notify.success('Deleted', 'Note deleted');
+      await refresh();
+      triggerCalendarRefresh();
+    } catch (error) {
+      notify.error('Error', 'Failed to delete note');
+      console.error('[Logbook] Delete note error:', error);
+    }
+  };
+
   const handleOpenTimesheet = (date: string) => {
     setSelectedDate(date);
     setTimesheetEditorVisible(true);
+  };
+
+  const handleDeleteTimesheet = async (date: string) => {
+    const timesheetToDelete = timesheets.find((t) => t.date === date);
+    if (!timesheetToDelete) return;
+
+    try {
+      await db.deleteTimesheet(timesheetToDelete.id);
+      notify.success('Deleted', 'Timesheet deleted');
+      await refresh();
+      triggerCalendarRefresh();
+    } catch (error) {
+      notify.error('Error', 'Failed to delete timesheet');
+      console.error('[Logbook] Delete timesheet error:', error);
+    }
   };
 
   const handleCloseEditors = () => {
@@ -388,86 +429,90 @@ export default function LogsScreen() {
           <View style={styles.tabsRow}>
             <View style={styles.segmentedControl}>
               {tabOptions.map((option) => {
-              const isActive = activeTab === option.value;
-              return (
-                <TouchableOpacity
-                  key={option.value}
-                  style={[
-                    styles.tabButton,
-                    isActive && { backgroundColor: colors.surfaceHighlight },
-                    isActive && styles.tabButtonActive,
-                  ]}
-                  onPress={() => setActiveTab(option.value)}
-                >
-                  <Ionicons
-                    name={option.icon as any}
-                    size={18}
-                    color={isActive ? colors.text : colors.textMuted}
-                  />
-                  <ThemedText
+                const isActive = activeTab === option.value;
+                return (
+                  <TouchableOpacity
+                    key={option.value}
                     style={[
-                      styles.tabButtonText,
-                      { color: isActive ? colors.text : colors.textMuted },
+                      styles.tabButton,
+                      isActive && { backgroundColor: colors.surfaceHighlight },
+                      isActive && styles.tabButtonActive,
                     ]}
+                    onPress={() => setActiveTab(option.value)}
                   >
-                    {option.label}
-                  </ThemedText>
-                </TouchableOpacity>
-              );
-            })}
-          </View>
+                    <Ionicons
+                      name={option.icon as any}
+                      size={18}
+                      color={isActive ? colors.text : colors.textMuted}
+                    />
+                    <ThemedText
+                      style={[
+                        styles.tabButtonText,
+                        { color: isActive ? colors.text : colors.textMuted },
+                      ]}
+                    >
+                      {option.label}
+                    </ThemedText>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
 
-          <View style={styles.actionButtons}>
-            <TouchableOpacity
-              style={[
-                styles.exportButton,
-                isExporting && styles.exportButtonDisabled,
-              ]}
-              onPress={
-                activeTab === 'notes'
-                  ? handleExportNotes
-                  : handleExportTimesheets
-              }
-              disabled={isExporting}
-              activeOpacity={0.7}
-            >
-              {isExporting ? (
-                <ActivityIndicator size="small" color={colors.primary} />
-              ) : (
-                <Ionicons
-                  name="share-outline"
-                  size={20}
-                  color={colors.primary}
-                />
-              )}
-            </TouchableOpacity>
-
-            {selectedYear <= currentYear && (
+            <View style={styles.actionButtons}>
               <TouchableOpacity
-                style={styles.deleteButton}
+                style={[
+                  styles.exportButton,
+                  isExporting && styles.exportButtonDisabled,
+                ]}
                 onPress={
                   activeTab === 'notes'
-                    ? handleBulkDeleteNotes
-                    : handleBulkDeleteTimesheets
+                    ? handleExportNotes
+                    : handleExportTimesheets
                 }
+                disabled={isExporting}
                 activeOpacity={0.7}
               >
-                <Ionicons name="trash-outline" size={20} color={colors.error} />
+                {isExporting ? (
+                  <ActivityIndicator size="small" color={colors.primary} />
+                ) : (
+                  <Ionicons
+                    name="share-outline"
+                    size={20}
+                    color={colors.primary}
+                  />
+                )}
               </TouchableOpacity>
-            )}
+
+              {selectedYear <= currentYear && (
+                <TouchableOpacity
+                  style={styles.deleteButton}
+                  onPress={
+                    activeTab === 'notes'
+                      ? handleBulkDeleteNotes
+                      : handleBulkDeleteTimesheets
+                  }
+                  activeOpacity={0.7}
+                >
+                  <Ionicons name="trash-outline" size={20} color={colors.error} />
+                </TouchableOpacity>
+              )}
+            </View>
           </View>
         </View>
       </View>
-    </View>
 
-    {isLoading ? (        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={colors.primary} />
-        </View>
+      {isLoading ? (<View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color={colors.primary} />
+      </View>
       ) : activeTab === 'notes' ? (
         <FlatList
           data={notes}
           renderItem={({ item }) => (
-            <LogbookNoteItem item={item} onPress={handleOpenNote} />
+            <LogbookNoteItem
+              item={item}
+              onPress={handleOpenNote}
+              onDelete={handleDeleteNote}
+            />
           )}
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.listContainer}
@@ -477,7 +522,11 @@ export default function LogsScreen() {
         <FlatList
           data={timesheets}
           renderItem={({ item }) => (
-            <LogbookTimesheetItem item={item} onPress={handleOpenTimesheet} />
+            <LogbookTimesheetItem
+              item={item}
+              onPress={handleOpenTimesheet}
+              onDelete={handleDeleteTimesheet}
+            />
           )}
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.listContainer}
@@ -509,12 +558,14 @@ export default function LogsScreen() {
         onDelete={
           editingNote
             ? async () => {
-                if (editingNote) {
-                  await db.deleteNote(editingNote.id);
-                  await refresh();
-                  handleCloseEditors();
-                }
+              if (editingNote) {
+                await db.deleteNote(editingNote.id);
+                notify.success('Deleted', 'Note deleted');
+                await refresh();
+                triggerCalendarRefresh();
+                handleCloseEditors();
               }
+            }
             : undefined
         }
       />
@@ -537,12 +588,14 @@ export default function LogsScreen() {
         onDelete={
           selectedTimesheet
             ? async () => {
-                if (selectedTimesheet) {
-                  await db.deleteTimesheet(selectedTimesheet.id);
-                  await refresh();
-                  handleCloseEditors();
-                }
+              if (selectedTimesheet) {
+                await db.deleteTimesheet(selectedTimesheet.id);
+                notify.success('Deleted', 'Timesheet deleted');
+                await refresh();
+                triggerCalendarRefresh();
+                handleCloseEditors();
               }
+            }
             : undefined
         }
       />

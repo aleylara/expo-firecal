@@ -1,5 +1,8 @@
+import { useDatabase } from '@/contexts/notes/database-context';
+import { SafeStorage } from '@/utils/safe-storage';
 import React, { useState } from 'react';
 import {
+  Alert,
   Modal,
   ScrollView,
   StyleSheet,
@@ -24,10 +27,10 @@ const themeOptions: {
   label: string;
   icon: string;
 }[] = [
-  { value: 'system', label: 'System', icon: 'settings-outline' },
-  { value: 'light', label: 'Light', icon: 'sunny-outline' },
-  { value: 'dark', label: 'Dark', icon: 'moon-outline' },
-];
+    { value: 'system', label: 'System', icon: 'settings-outline' },
+    { value: 'light', label: 'Light', icon: 'sunny-outline' },
+    { value: 'dark', label: 'Dark', icon: 'moon-outline' },
+  ];
 
 const SectionHeader = ({
   title,
@@ -54,7 +57,44 @@ export default function SettingsScreen() {
   const { hasFireCalPro, presentPaywall, presentCustomerCenter } =
     useSubscription();
   const { colors, platoonColors } = useThemedStyles();
+  const { resetDatabase } = useDatabase();
   const [showStationPicker, setShowStationPicker] = useState(false);
+
+  const handleResetDatabase = () => {
+    Alert.alert(
+      'Reset Database',
+      'Are you sure you want to delete all data? This action cannot be undone.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Reset',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              // 1. Clear SQLite tables (Schema reset)
+              await resetDatabase();
+
+              // 2. Clear User Settings (AsyncStorage)
+              const storageCleared = await SafeStorage.clearAll();
+              
+              if (!storageCleared) {
+                console.warn('AsyncStorage clear failed but database was reset');
+              }
+
+              Alert.alert(
+                'Success',
+                'Database and settings have been reset. Please manually close and reopen the app to apply changes.',
+                [{ text: 'OK' }]
+              );
+            } catch (error) {
+              Alert.alert('Error', 'Failed to reset database.');
+              console.error(error);
+            }
+          },
+        },
+      ],
+    );
+  };
 
   const handleThemeChange = (theme: ThemeMode) => {
     setThemeMode(theme);
@@ -284,6 +324,42 @@ export default function SettingsScreen() {
                     color={colors.textMuted}
                   />
                 </View>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          {/* Data Management Section */}
+          <View style={styles.sectionContainer}>
+            <SectionHeader
+              title="Data Management"
+              icon="server-outline"
+              colors={colors}
+              styles={styles}
+            />
+            <View
+              style={[
+                styles.card,
+                {
+                  backgroundColor: colors.surfaceElevated,
+                  borderColor: colors.borderLight,
+                },
+              ]}
+            >
+              <TouchableOpacity
+                style={styles.settingRow}
+                onPress={handleResetDatabase}
+              >
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                  <Ionicons name="trash-outline" size={20} color={colors.error} />
+                  <ThemedText style={[styles.settingLabel, { color: colors.error }]}>
+                    Reset Database
+                  </ThemedText>
+                </View>
+                <Ionicons
+                  name="chevron-forward"
+                  size={16}
+                  color={colors.textMuted}
+                />
               </TouchableOpacity>
             </View>
           </View>
