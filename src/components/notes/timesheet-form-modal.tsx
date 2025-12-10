@@ -548,6 +548,9 @@ export default function TimesheetFormModal({
                       <Text style={[styles.rowLabel, { color: colors.text }]}>
                         Action Required{actionRequired ? <Text style={{ fontSize: 12 }}> 🚩</Text> : ''}
                       </Text>
+                      <Text style={[styles.helperText, { color: colors.textMuted }]}>
+                        Flag entries that need follow-up
+                      </Text>
                     </View>
                     <Switch
                       value={actionRequired}
@@ -562,7 +565,7 @@ export default function TimesheetFormModal({
                     label="Taken Leave"
                     value={takenLeave}
                     onChange={setTakenLeave}
-                    placeholder="e.g. 2Hrs CL"
+                    placeholder="e.g. CL 4H"
                     colors={colors}
                   />
                   <View style={[styles.formRow, { height: 'auto', flexDirection: 'column', alignItems: 'flex-start', paddingTop: 12, paddingBottom: 12 }]}>
@@ -770,5 +773,9 @@ const styles = StyleSheet.create({
     height: 48,
     borderRadius: 12,
     marginBottom: 40,
+  },
+  helperText: {
+    fontSize: 12,
+    marginTop: 2,
   },
 });
