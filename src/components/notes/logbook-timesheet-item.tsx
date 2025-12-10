@@ -74,13 +74,9 @@ export const LogbookTimesheetItem = React.memo(
           dateRow: {
             flexDirection: 'row',
             alignItems: 'center',
-            gap: 8,
+            gap: 4,
           },
-          otBadge: {
-            // paddingHorizontal: 6, // Removed
-            // paddingVertical: 2, // Removed
-            // borderRadius: 4, // Removed
-          },
+          otBadge: {},
           otBadgeText: {
             color: colors.warning,
             fontSize: 12, // Increased from 10
@@ -88,15 +84,9 @@ export const LogbookTimesheetItem = React.memo(
             letterSpacing: 0.5,
           },
           actionBadge: {
-            // paddingHorizontal: 6, // Removed
-            // paddingVertical: 2, // Removed
-            // borderRadius: 4, // Removed
-            // backgroundColor: colors.surfaceHighlight, // Removed
             marginLeft: 6,
           },
-          actionBadgeText: {
-            // fontSize: 10,
-          },
+          actionBadgeText: {},
           deleteButton: {
             padding: 4,
           },

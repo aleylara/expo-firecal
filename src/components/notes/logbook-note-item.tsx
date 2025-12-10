@@ -74,16 +74,11 @@ export const LogbookNoteItem = React.memo(
           dateRow: {
             flexDirection: 'row',
             alignItems: 'center',
-            gap: 8,
+            gap: 4,
           },
           actionBadge: {
-            // paddingHorizontal: 6, // Removed
-            // paddingVertical: 2,   // Removed
-            // borderRadius: 4,      // Removed
-            // backgroundColor: colors.surfaceHighlight, // Removed
           },
           actionBadgeText: {
-            // fontSize: 10, // Removed as we use icon now
           },
           deleteButton: {
             padding: 4,

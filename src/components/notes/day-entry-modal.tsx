@@ -275,7 +275,7 @@ export default function DayEntryModal({
                         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 2 }}>
                           <Text style={styles.cardTitle} numberOfLines={1}>{note?.title || 'Note'}</Text>
                           {note?.action_required === 1 && (
-                            <View style={{ backgroundColor: colors.surfaceHighlight, paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 }}>
+                            <View>
                               <Ionicons name="flag" size={16} color={colors.warning} />
                             </View>
                           )}
@@ -309,12 +309,12 @@ export default function DayEntryModal({
                         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 2 }}>
                           <Text style={styles.cardTitle}>Shift Entry</Text>
                           {timesheet.overtime_shift === 1 && (
-                            <View style={{ backgroundColor: colors.surfaceHighlight, paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 }}>
-                              <Text style={{ fontSize: 10, fontWeight: '700', color: colors.warning }}>OT</Text>
+                            <View>
+                              <Text style={{ fontSize: 13, fontWeight: '700', color: colors.warning }}>OT</Text>
                             </View>
                           )}
                           {timesheet.action_required === 1 && (
-                            <View style={{ backgroundColor: colors.surfaceHighlight, paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 }}>
+                            <View>
                               <Ionicons name="flag" size={16} color={colors.warning} />
                             </View>
                           )}
