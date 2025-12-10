@@ -66,14 +66,14 @@ export function OnboardingProvider({
 
   // Check onboarding status on mount
   useEffect(() => {
-    console.log('[Onboarding] Checking status...');
+    // console.log('[Onboarding] Checking status...');
     checkStatus();
   }, []);
 
   const checkStatus = async () => {
     try {
       const complete = await checkOnboardingComplete();
-      console.log('[Onboarding] Complete status:', complete);
+      // console.log('[Onboarding] Complete status:', complete);
       setState((prev) => ({
         ...prev,
         isComplete: complete,
