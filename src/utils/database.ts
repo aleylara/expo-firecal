@@ -11,8 +11,6 @@
 import * as SQLite from 'expo-sqlite';
 
 export async function initializeDatabase(db: SQLite.SQLiteDatabase) {
-  console.log('[Database] initializeDatabase called');
-
   // 1. Create tables if they don't exist
   await db.execAsync(`
     PRAGMA journal_mode = WAL;
