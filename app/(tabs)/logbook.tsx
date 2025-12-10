@@ -43,9 +43,9 @@ const tabOptions: {
   label: string;
   icon: string;
 }[] = [
-  { value: 'notes', label: 'Notes', icon: 'document-text-outline' },
-  { value: 'timesheet', label: 'Timesheet', icon: 'time-outline' },
-];
+    { value: 'notes', label: 'Notes', icon: 'document-text-outline' },
+    { value: 'timesheet', label: 'Timesheet', icon: 'time-outline' },
+  ];
 
 export default function LogsScreen() {
   const { colors, tokens } = useThemedStyles();
@@ -391,6 +391,7 @@ export default function LogsScreen() {
       <Text style={styles.emptyText}>
         No {activeTab} found for {selectedYear}
       </Text>
+      <Text style={styles.emptyText}>Tap a calendar day to create one</Text>
     </View>
   );
 
