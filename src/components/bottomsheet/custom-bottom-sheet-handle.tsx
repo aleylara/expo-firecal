@@ -220,7 +220,6 @@ const styles = StyleSheet.create({
     width: 14,
     height: 5,
     marginTop: -2.5, // Center vertically
-    opacity: 0.7,
   },
   leftIndicator: {
     borderTopStartRadius: 2,

@@ -136,33 +136,33 @@ export default function AnnualLeaveTable({
   return (
     <View style={[common.container, { backgroundColor: colors.surface }]}>
       <View style={styles.headerContainer}>
-         <TouchableOpacity
-            style={[styles.arrowButton, { opacity: isExpanded && !isPrevDisabled ? 1 : 0 }]}
-            onPress={handlePrevGroup}
-            disabled={!isExpanded || isPrevDisabled}
-          >
-            <Ionicons name="chevron-back" size={20} color={colors.primary} />
-          </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.arrowButton, { opacity: isExpanded && !isPrevDisabled ? 1 : 0 }]}
+          onPress={handlePrevGroup}
+          disabled={!isExpanded || isPrevDisabled}
+        >
+          <Ionicons name="chevron-back" size={20} color={colors.primary} />
+        </TouchableOpacity>
 
         <View style={styles.groupIdContainer}>
-            <Text
-              style={[
-                common.text,
-                styles.groupIdText,
-                { color: getPlatoonColor(currentGroupId.charAt(0)) },
-              ]}
-            >
-              {currentGroupId}
-            </Text>
+          <Text
+            style={[
+              common.text,
+              styles.groupIdText,
+              { color: getPlatoonColor(currentGroupId.charAt(0)) },
+            ]}
+          >
+            {currentGroupId}
+          </Text>
         </View>
 
         <TouchableOpacity
-            style={[styles.arrowButton, { opacity: isExpanded && !isNextDisabled ? 1 : 0 }]}
-            onPress={handleNextGroup}
-            disabled={!isExpanded || isNextDisabled}
-          >
-            <Ionicons name="chevron-forward" size={20} color={colors.primary} />
-          </TouchableOpacity>
+          style={[styles.arrowButton, { opacity: isExpanded && !isNextDisabled ? 1 : 0 }]}
+          onPress={handleNextGroup}
+          disabled={!isExpanded || isNextDisabled}
+        >
+          <Ionicons name="chevron-forward" size={20} color={colors.primary} />
+        </TouchableOpacity>
       </View>
 
       <ScheduleTable
@@ -195,6 +195,5 @@ const styles = StyleSheet.create({
   groupIdText: {
     fontSize: 16,
     fontWeight: '700',
-    opacity: 0.8,
   },
 });
