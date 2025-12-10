@@ -74,8 +74,8 @@ export function generateNotesCSV(notes: Note[]): string {
     escapeCSV(formatDate(note.date)),
     escapeCSV(note.title),
     escapeCSV(
-      note.content +
-      (note.action_required === 1 ? ' (Follow-up Required)' : ''),
+      (note.action_required === 1 ? '(Follow-up Required) ' : '') +
+      note.content,
     ),
   ]);
 
@@ -130,8 +130,8 @@ export function generateNotesTXT(notes: Note[], year: number): string {
     lines.push(`Date: ${formatDate(note.date)}`);
     lines.push(`Title: ${note.title || ''}`);
     lines.push(
-      `Content: ${note.content || ''}${note.action_required === 1 ? ' (Follow-up Required)' : ''
-      }`,
+      `Content: ${note.action_required === 1 ? '(Follow-up Required) ' : ''
+      }${note.content || ''}`,
     );
     lines.push('');
   });
