@@ -8,6 +8,7 @@ export interface Note {
   date: string;
   title: string | null;
   content: string | null;
+  action_required: number; // 0 or 1
   created_at: string;
   updated_at: string;
 }
@@ -15,11 +16,13 @@ export interface Note {
 export interface CreateNoteInput {
   title?: string | null;
   content?: string | null;
+  action_required?: boolean;
 }
 
 export interface UpdateNoteInput {
   title?: string | null;
   content?: string | null;
+  action_required?: boolean;
 }
 
 // Timesheet types

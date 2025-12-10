@@ -73,7 +73,10 @@ export function generateNotesCSV(notes: Note[]): string {
   const rows = notes.map((note) => [
     escapeCSV(formatDate(note.date)),
     escapeCSV(note.title),
-    escapeCSV(note.content),
+    escapeCSV(
+      note.content +
+      (note.action_required === 1 ? ' (Follow-up Required)' : ''),
+    ),
   ]);
 
   return [headers.join(','), ...rows.map((row) => row.join(','))].join('\n');
@@ -100,7 +103,7 @@ export function generateTimesheetsCSV(timesheets: Timesheet[]): string {
 
   const rows = timesheets.map((ts) => [
     escapeCSV(formatDate(ts.date)),
-    escapeCSV(ts.overtime_shift === 1 ? 'OT' : ''),
+    escapeCSV(ts.overtime_shift === 1 ? 'RECALL' : ''),
     escapeCSV(formatTime(ts.start_time)),
     escapeCSV(formatTime(ts.finish_time)),
     escapeCSV(ts.total_hours),
@@ -109,7 +112,7 @@ export function generateTimesheetsCSV(timesheets: Timesheet[]): string {
     escapeCSV(ts.return_kms),
     escapeCSV(formatTime(ts.stayback)),
     escapeCSV(ts.taken_leave),
-    escapeCSV(ts.action_required === 1 ? 'Check' : ''),
+    escapeCSV(ts.action_required === 1 ? 'Follow-up Required' : ''),
     escapeCSV(ts.comments),
   ]);
 
@@ -126,7 +129,10 @@ export function generateNotesTXT(notes: Note[], year: number): string {
     if (index > 0) lines.push('---', '');
     lines.push(`Date: ${formatDate(note.date)}`);
     lines.push(`Title: ${note.title || ''}`);
-    lines.push(`Content: ${note.content || ''}`);
+    lines.push(
+      `Content: ${note.content || ''}${note.action_required === 1 ? ' (Follow-up Required)' : ''
+      }`,
+    );
     lines.push('');
   });
 
@@ -155,11 +161,11 @@ export function generateTimesheetsTXT(
       lines.push(`Stayback: ${formatTime(ts.stayback)}`);
     }
     if (ts.overtime_shift === 1) {
-      lines.push(`Overtime: OT`);
+      lines.push(`Overtime: RECALL`);
     }
     lines.push(`Taken Leave: ${ts.taken_leave || ''}`);
     if (ts.action_required === 1) {
-      lines.push(`Action Required: Check`);
+      lines.push(`Action Required: Follow-up Required`);
     }
     lines.push(`Comments: ${ts.comments || ''}`);
     lines.push('');

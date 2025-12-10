@@ -540,17 +540,20 @@ export default function LogsScreen() {
         date={selectedDate}
         note={editingNote}
         onClose={handleCloseEditors}
-        onSave={async (noteTitle, noteContent) => {
+        onSave={async (noteTitle, noteContent, actionRequired) => {
+          console.log('[Logbook] onSave actionRequired:', actionRequired);
           if (!selectedDate) return;
           if (editingNote) {
             await db.updateNote(editingNote.id, {
               title: noteTitle,
               content: noteContent,
+              action_required: actionRequired,
             });
           } else {
             await db.createNote(selectedDate, {
               title: noteTitle,
               content: noteContent,
+              action_required: actionRequired,
             });
           }
           await refresh();

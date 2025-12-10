@@ -11,6 +11,9 @@
 import * as SQLite from 'expo-sqlite';
 
 export async function initializeDatabase(db: SQLite.SQLiteDatabase) {
+  console.log('[Database] initializeDatabase called');
+
+  // 1. Create tables if they don't exist
   await db.execAsync(`
     PRAGMA journal_mode = WAL;
     PRAGMA foreign_keys = ON;
@@ -21,6 +24,7 @@ export async function initializeDatabase(db: SQLite.SQLiteDatabase) {
       date TEXT NOT NULL UNIQUE,
       title TEXT,
       content TEXT,
+      action_required INTEGER DEFAULT 0,
       created_at TEXT NOT NULL,
       updated_at TEXT NOT NULL
     );
@@ -48,4 +52,5 @@ export async function initializeDatabase(db: SQLite.SQLiteDatabase) {
     
     CREATE INDEX IF NOT EXISTS idx_timesheets_date ON timesheets(date);
   `);
+
 }

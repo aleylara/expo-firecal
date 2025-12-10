@@ -64,7 +64,7 @@ export default function TimesheetFormModal({
   onSave,
   onDelete,
 }: TimesheetFormModalProps) {
-  const { colors, common, tokens } = useThemedStyles();
+  const { colors, common } = useThemedStyles();
   const { userGroup } = useTheme();
   const distanceMatrix = useMemo(() => new DistanceMatrix(), []);
 
@@ -247,7 +247,7 @@ export default function TimesheetFormModal({
         // Auto-trigger action_required when N/A is set (skip on initial load)
         if (!suppressActionRequiredTrigger.current) {
           setActionRequired(true);
-          
+
           // Add ESS claim note once (only if comments are empty)
           if (!comments.trim()) {
             setComments('Submit a Quick Claim in ESS');
@@ -255,7 +255,7 @@ export default function TimesheetFormModal({
         }
       }
     }
-    
+
     // Clear suppression flag after first effect run
     suppressActionRequiredTrigger.current = false;
   }, [fromStation, toStation, manualKmsOverride, distanceMatrix]);
@@ -534,7 +534,9 @@ export default function TimesheetFormModal({
                     keyboardType="numeric"
                     isLast
                     colors={colors}
-                    suffix={returnKms === 'N/A' ? ' 🚩' : null}
+                    suffix={returnKms === 'N/A' ? (
+                      <Ionicons name="flag" size={14} color={colors.warning} />
+                    ) : null}
                     onFocus={handleKmsFocus}
                     onBlur={handleKmsBlur}
                   />
@@ -543,11 +545,14 @@ export default function TimesheetFormModal({
                 {/* Other Details Group */}
                 <FormGroup title="Additional Info" colors={colors}>
 
-                  <View style={[styles.formRow, styles.switchRow, { borderBottomWidth: 0.5, borderBottomColor: colors.borderLight }]}>
+                  <View style={[styles.switchRow, { backgroundColor: colors.surfaceElevated, borderColor: colors.borderLight }]}>
                     <View style={styles.switchLabelContainer}>
-                      <Text style={[styles.rowLabel, { color: colors.text }]}>
-                        Action Required{actionRequired ? <Text style={{ fontSize: 12 }}> 🚩</Text> : ''}
-                      </Text>
+                      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                        <Text style={[styles.switchLabel, { color: colors.text }]}>Action Required</Text>
+                        {actionRequired && (
+                          <Ionicons name="flag" size={16} color={colors.warning} style={{ marginLeft: 8 }} />
+                        )}
+                      </View>
                       <Text style={[styles.helperText, { color: colors.textMuted }]}>
                         Flag entries that need follow-up
                       </Text>
@@ -642,7 +647,7 @@ interface FormRowProps {
   onFocus?: () => void;
   onBlur?: () => void;
   colors: any; // Using any for colors context object for simplicity as it comes from hook
-  suffix?: string | null;
+  suffix?: string | React.ReactNode | null;
 }
 
 const FormRow = ({
@@ -686,7 +691,7 @@ const FormRow = ({
           onFocus={onFocus}
           onBlur={onBlur}
         />
-        {suffix && <Text style={{ fontSize: 14, marginLeft: 4 }}>{suffix}</Text>}
+        {suffix && (typeof suffix === 'string' ? <Text style={{ fontSize: 14, marginLeft: 4 }}>{suffix}</Text> : <View style={{ marginLeft: 4 }}>{suffix}</View>)}
       </View>
     )}
     {error ? <Text style={styles.inlineError}>{error}</Text> : null}
@@ -738,9 +743,20 @@ const styles = StyleSheet.create({
     height: 48, // Standard row height
   },
   switchRow: {
-    height: 60,
-    paddingVertical: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 12,
+    borderWidth: 0.5,
+    marginBottom: 20,
   },
+  switchLabel: {
+    fontSize: 16,
+    fontWeight: '400',
+  },
+
   switchLabelContainer: {
     flex: 1,
   },

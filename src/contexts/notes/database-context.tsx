@@ -138,13 +138,18 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
       const id = generateId();
       const now = getCurrentTimestamp();
 
+      const actionRequiredValue = data.action_required ? 1 : 0;
+
       await db.runAsync(
         `INSERT INTO notes (
-          id, date, title, content,
+          id, date, title, content, action_required,
           created_at, updated_at
-        ) VALUES (?, ?, ?, ?, ?, ?)`,
-        [id, date, data.title || null, data.content || null, now, now],
+        ) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        [id, date, data.title || null, data.content || null, actionRequiredValue, now, now],
       );
+
+      // Verify the insert
+      // const inserted = await db.getFirstAsync<Note>('SELECT * FROM notes WHERE id = ?', [id]);
 
       return id;
     };
@@ -154,10 +159,14 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
       id: string,
       data: UpdateNoteInput,
     ): Promise<void> => {
+      const dbData = {
+        ...data,
+        action_required: data.action_required !== undefined ? (data.action_required ? 1 : 0) : undefined,
+      };
       const { sql, values } = buildUpdateQuery(
         'notes',
         id,
-        data as Record<string, SQLiteBindValue | undefined>,
+        dbData as Record<string, SQLiteBindValue | undefined>,
       );
       await db.runAsync(sql, values);
     };
@@ -396,7 +405,7 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
 
       // Only select first 150 chars of content
       const notes = await db.getAllAsync<Note>(
-        `SELECT id, date, title, SUBSTR(content, 1, 150) as content, created_at, updated_at 
+        `SELECT id, date, title, SUBSTR(content, 1, 150) as content, action_required, created_at, updated_at 
          FROM notes WHERE date >= ? AND date <= ? ORDER BY date DESC`,
         [startDate, endDate],
       );

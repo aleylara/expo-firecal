@@ -29,6 +29,7 @@ import {
   Platform,
   ScrollView,
   StyleSheet,
+  Switch,
   Text,
   TextInput,
   TouchableOpacity,
@@ -41,7 +42,7 @@ interface NoteFormModalProps {
   date: string | null;
   note?: Note | null;
   onClose: () => void;
-  onSave: (noteTitle: string | null, noteContent: string) => Promise<void>;
+  onSave: (noteTitle: string | null, noteContent: string, actionRequired: boolean) => Promise<void>;
   onDelete?: () => Promise<void>;
 }
 
@@ -58,12 +59,14 @@ export default function NoteFormModal({
   const { colors, common, tokens } = useThemedStyles();
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
+  const [actionRequired, setActionRequired] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     if (visible) {
       setTitle(note?.title || '');
       setContent(note?.content || '');
+      setActionRequired(note?.action_required === 1);
     }
   }, [visible, note]);
 
@@ -71,9 +74,11 @@ export default function NoteFormModal({
     if (content.trim().length === 0) return;
     if (content.length > MAX_CHARS) return;
 
+    if (content.length > MAX_CHARS) return;
+
     setIsSaving(true);
     try {
-      await onSave(title.trim() || null, content.trim());
+      await onSave(title.trim() || null, content.trim(), actionRequired);
       onClose();
     } finally {
       setIsSaving(false);
@@ -129,13 +134,13 @@ export default function NoteFormModal({
             </TouchableOpacity>
 
             <View style={styles.headerTitleContainer}>
-               <Text style={[styles.headerDate, { color: colors.text }]}>
-                  {date ? formatDateString(date, 'EEE, d MMM') : 'New Note'}
-                </Text>
+              <Text style={[styles.headerDate, { color: colors.text }]}>
+                {date ? formatDateString(date, 'EEE, d MMM') : 'New Note'}
+              </Text>
             </View>
 
-            <TouchableOpacity 
-              onPress={handleSave} 
+            <TouchableOpacity
+              onPress={handleSave}
               disabled={!canSave}
               style={[styles.headerButton, { opacity: canSave ? 1 : 0.5 }]}
             >
@@ -148,6 +153,29 @@ export default function NoteFormModal({
             keyboardShouldPersistTaps="handled"
             contentContainerStyle={{ paddingBottom: 100 }}
           >
+            {/* Action Required Toggle */}
+            <View style={[styles.switchRow, { backgroundColor: colors.surfaceElevated, borderColor: colors.borderLight }]}>
+              <View style={styles.switchLabelContainer}>
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  <Text style={[styles.switchLabel, { color: colors.text }]}>Action Required</Text>
+                  {actionRequired && (
+                    <Ionicons name="flag" size={16} color={colors.warning} style={{ marginLeft: 8 }} />
+                  )}
+                </View>
+                <Text style={[styles.helperText, { color: colors.textMuted }]}>
+                  Flag notes that need follow-up
+                </Text>
+              </View>
+              <Switch
+                value={actionRequired}
+                onValueChange={setActionRequired}
+                trackColor={{ false: colors.borderStrong, true: colors.warning }}
+                thumbColor={colors.switchThumb}
+                ios_backgroundColor={colors.borderStrong}
+                style={{ transform: [{ scaleX: 1.1 }, { scaleY: 1.1 }] }}
+              />
+            </View>
+
             {/* Title Input */}
             <TextInput
               style={[
@@ -180,21 +208,21 @@ export default function NoteFormModal({
 
           {/* Footer with char counter */}
           <View style={[styles.footer, { borderTopColor: colors.borderLight }]}>
-             <Text
-                style={[
-                  styles.charCounter,
-                  { color: isOverLimit ? colors.error : colors.textMuted },
-                ]}
-              >
-                {charCount} / {MAX_CHARS}
-              </Text>
+            <Text
+              style={[
+                styles.charCounter,
+                { color: isOverLimit ? colors.error : colors.textMuted },
+              ]}
+            >
+              {charCount} / {MAX_CHARS}
+            </Text>
           </View>
 
           {/* Delete Button */}
           {note && onDelete && (
             <View style={{ paddingHorizontal: 16, paddingBottom: 16 }}>
-              <TouchableOpacity 
-                onPress={handleDelete} 
+              <TouchableOpacity
+                onPress={handleDelete}
                 style={[styles.deleteButton, { backgroundColor: colors.surfaceElevated }]}
               >
                 <Text style={{ color: colors.error, fontSize: 17, fontWeight: '500' }}>Delete Entry</Text>
@@ -234,6 +262,27 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 20,
     paddingTop: 20,
+  },
+  switchRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 12,
+    borderWidth: 0.5,
+    marginBottom: 20,
+  },
+  switchLabelContainer: {
+    flex: 1,
+  },
+  switchLabel: {
+    fontSize: 16,
+    fontWeight: '400',
+  },
+  helperText: {
+    fontSize: 12,
+    marginTop: 2,
   },
   titleInput: {
     fontSize: 24,

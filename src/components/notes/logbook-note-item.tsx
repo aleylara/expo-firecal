@@ -71,12 +71,27 @@ export const LogbookNoteItem = React.memo(
             alignItems: 'center',
             marginBottom: 2,
           },
+          dateRow: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 8,
+          },
+          actionBadge: {
+            // paddingHorizontal: 6, // Removed
+            // paddingVertical: 2,   // Removed
+            // borderRadius: 4,      // Removed
+            // backgroundColor: colors.surfaceHighlight, // Removed
+          },
+          actionBadgeText: {
+            // fontSize: 10, // Removed as we use icon now
+          },
           deleteButton: {
             padding: 4,
           },
         }),
       [colors, tokens],
     );
+
 
     return (
       <TouchableOpacity
@@ -85,9 +100,16 @@ export const LogbookNoteItem = React.memo(
         activeOpacity={0.7}
       >
         <View style={styles.header}>
-          <Text style={styles.itemDate}>
-            {formatDateString(item.date, 'EEE, d MMMM')}
-          </Text>
+          <View style={styles.dateRow}>
+            <Text style={styles.itemDate}>
+              {formatDateString(item.date, 'EEE, d MMMM')}
+            </Text>
+            {item.action_required && (
+              <View style={styles.actionBadge}>
+                <Ionicons name="flag" size={16} color={colors.warning} />
+              </View>
+            )}
+          </View>
           <TouchableOpacity
             style={styles.deleteButton}
             onPress={handleDelete}

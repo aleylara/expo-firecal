@@ -77,25 +77,25 @@ export const LogbookTimesheetItem = React.memo(
             gap: 8,
           },
           otBadge: {
-            paddingHorizontal: 6,
-            paddingVertical: 2,
-            borderRadius: 4,
+            // paddingHorizontal: 6, // Removed
+            // paddingVertical: 2, // Removed
+            // borderRadius: 4, // Removed
           },
           otBadgeText: {
             color: colors.warning,
-            fontSize: 10,
+            fontSize: 12, // Increased from 10
             fontWeight: '700',
             letterSpacing: 0.5,
           },
           actionBadge: {
-            paddingHorizontal: 6,
-            paddingVertical: 2,
-            borderRadius: 4,
-            backgroundColor: colors.surfaceHighlight,
+            // paddingHorizontal: 6, // Removed
+            // paddingVertical: 2, // Removed
+            // borderRadius: 4, // Removed
+            // backgroundColor: colors.surfaceHighlight, // Removed
             marginLeft: 6,
           },
           actionBadgeText: {
-            fontSize: 10,
+            // fontSize: 10,
           },
           deleteButton: {
             padding: 4,
@@ -104,7 +104,7 @@ export const LogbookTimesheetItem = React.memo(
       [colors, tokens],
     );
 
-    // Format Start - Finish (Total)
+    // Format Start - Finish (Total) • Stayback: HH:MM
     const timeString = `${item.start_time ? formatHHMMToDisplay(item.start_time) : '?'} - ${item.finish_time ? formatHHMMToDisplay(item.finish_time) : '?'}${item.total_hours ? ` (${item.total_hours}h)` : ''}${item.stayback ? ` • Stayback: ${formatHHMMToDisplay(item.stayback)}` : ''}`;
 
     // Format To Station • Return Kms
@@ -127,13 +127,13 @@ export const LogbookTimesheetItem = React.memo(
               {formatDateString(item.date, 'EEE, d MMMM')}
             </Text>
             {item.overtime_shift === 1 && (
-              <View style={[styles.otBadge, { backgroundColor: colors.surfaceHighlight }]}>
+              <View style={styles.otBadge}>
                 <Text style={styles.otBadgeText}>OT</Text>
               </View>
             )}
             {item.action_required === 1 && (
               <View style={styles.actionBadge}>
-                <Text style={styles.actionBadgeText}>🚩</Text>
+                <Ionicons name="flag" size={16} color={colors.warning} />
               </View>
             )}
           </View>

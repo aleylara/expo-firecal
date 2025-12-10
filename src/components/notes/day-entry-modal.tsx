@@ -58,9 +58,10 @@ export default function DayEntryModal({
   const handleSaveNote = async (
     noteTitle: string | null,
     noteContent: string,
+    actionRequired: boolean,
   ) => {
     try {
-      await saveNote({ title: noteTitle, content: noteContent });
+      await saveNote({ title: noteTitle, content: noteContent, action_required: actionRequired });
       notify.success('Saved', 'Note saved successfully');
       setNoteEditorVisible(false);
 
@@ -123,7 +124,7 @@ export default function DayEntryModal({
     try {
       await deleteTimesheet();
       notify.success('Deleted', 'Timesheet deleted');
-      
+
       // Close local editor state
       setTimesheetEditorVisible(false);
 
@@ -271,7 +272,14 @@ export default function DayEntryModal({
                   <View style={styles.cardContent}>
                     {hasNote ? (
                       <>
-                        <Text style={styles.cardTitle} numberOfLines={1}>{note?.title || 'Note'}</Text>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 2 }}>
+                          <Text style={styles.cardTitle} numberOfLines={1}>{note?.title || 'Note'}</Text>
+                          {note?.action_required === 1 && (
+                            <View style={{ backgroundColor: colors.surfaceHighlight, paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 }}>
+                              <Ionicons name="flag" size={16} color={colors.warning} />
+                            </View>
+                          )}
+                        </View>
                         <Text style={styles.cardSubtitle} numberOfLines={2}>{note?.content}</Text>
                       </>
                     ) : (
@@ -307,7 +315,7 @@ export default function DayEntryModal({
                           )}
                           {timesheet.action_required === 1 && (
                             <View style={{ backgroundColor: colors.surfaceHighlight, paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 }}>
-                              <Text style={{ fontSize: 10 }}>🚩</Text>
+                              <Ionicons name="flag" size={16} color={colors.warning} />
                             </View>
                           )}
                         </View>
