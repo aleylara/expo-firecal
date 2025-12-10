@@ -27,9 +27,9 @@ export default function ScheduleTable({
     <View style={styles.table} key={groupId}>
       {/* Table Header */}
       <View style={styles.tableHeader}>
-        <Text style={[styles.headerCell, styles.setCell]}>SETS</Text>
+        <Text style={[styles.headerCell, styles.setCell]}>SET</Text>
         <Text style={[styles.headerCell, styles.leaveCell]}>LEAVE DATE</Text>
-        <Text style={[styles.headerCell, styles.startsCell]}>1ST DAY OFF</Text>
+        <Text style={[styles.headerCell, styles.startsCell]}>1ST DAYOFF</Text>
         <Text style={[styles.headerCell, styles.returnCell]}>RETURNS</Text>
       </View>
 
