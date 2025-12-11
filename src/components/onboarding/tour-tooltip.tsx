@@ -10,7 +10,12 @@
  */
 
 import React from 'react';
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import {
+  StyleSheet,
+  TouchableOpacity,
+  View,
+  type ViewStyle,
+} from 'react-native';
 
 import { ThemedText } from '@/components/theme/themed-text';
 import { useThemedStyles } from '@/hooks/use-themed-styles';
@@ -20,6 +25,7 @@ interface TourTooltipProps {
   description: string;
   onNext: () => void;
   onSkip: () => void;
+  containerStyle?: ViewStyle;
 }
 
 export function TourTooltip({
@@ -27,6 +33,7 @@ export function TourTooltip({
   description,
   onNext,
   onSkip,
+  containerStyle,
 }: TourTooltipProps) {
   const { colors, tokens } = useThemedStyles();
 
@@ -88,7 +95,7 @@ export function TourTooltip({
   });
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, containerStyle]}>
       <TouchableOpacity style={styles.skipButton} onPress={onSkip}>
         <ThemedText style={styles.skipText}>Skip</ThemedText>
       </TouchableOpacity>
@@ -99,7 +106,15 @@ export function TourTooltip({
           <React.Fragment key={index}>
             {part}
             {index < array.length - 1 && (
-              <ThemedText style={[styles.description, { backgroundColor: colors.leaveHighlight, paddingHorizontal: 2 }]}>
+              <ThemedText
+                style={[
+                  styles.description,
+                  {
+                    backgroundColor: colors.leaveHighlight,
+                    paddingHorizontal: 2,
+                  },
+                ]}
+              >
                 highlighted
               </ThemedText>
             )}

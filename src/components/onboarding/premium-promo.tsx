@@ -83,7 +83,6 @@ export function PremiumPromo() {
       marginRight: 10,
       color: colors.textMuted,
       textAlign: 'right',
-      fontStyle: 'italic',
     },
   });
 
@@ -96,15 +95,20 @@ export function PremiumPromo() {
             <Ionicons name="star" size={40} color={colors.primary} />
           </View>
 
-          <ThemedText style={styles.title}>You're All Set!</ThemedText>
+          <ThemedText style={styles.title}>You&apos;re All Set!</ThemedText>
 
           <ThemedText style={styles.description}>
-            FireCal is free to use. If you find it helpful, consider supporting its continued development with a cup of coffee.
+            FireCal is free to use. If you find it helpful, consider supporting
+            its continued development with a cup of coffee.
           </ThemedText>
-          <View style={{ width: '100%', alignItems: 'flex-end', marginBottom: tokens.space.lg }}>
-            <ThemedText style={styles.note}>
-              Cheers! Sami
-            </ThemedText>
+          <View
+            style={{
+              width: '100%',
+              alignItems: 'flex-end',
+              marginBottom: tokens.space.lg,
+            }}
+          >
+            <ThemedText style={styles.note}>Cheers! Sami</ThemedText>
           </View>
           {/* Premium Features Card */}
           <View style={styles.card}>
@@ -113,16 +117,30 @@ export function PremiumPromo() {
               <ThemedText style={styles.featureText}>Pro Features</ThemedText>
             </View>
             <View style={styles.featureRow}>
-              <Ionicons name="checkmark-circle" size={24} color={colors.primary} />
-              <ThemedText style={styles.featureText}>Ad-free experience</ThemedText>
+              <Ionicons
+                name="checkmark-circle"
+                size={24}
+                color={colors.primary}
+              />
+              <ThemedText style={styles.featureText}>
+                Ad-free experience
+              </ThemedText>
             </View>
             <View style={styles.featureRow}>
               <Ionicons name="heart" size={24} color={colors.primary} />
-              <ThemedText style={styles.featureText}>Support a fellow Firefighter </ThemedText>
+              <ThemedText style={styles.featureText}>
+                Support a fellow Firefighter{' '}
+              </ThemedText>
             </View>
             <View style={[styles.featureRow, { marginBottom: 0 }]}>
-              <Ionicons name="settings-outline" size={24} color={colors.textMuted} />
-              <ThemedText style={[styles.featureText, { color: colors.textSecondary }]}>
+              <Ionicons
+                name="settings-outline"
+                size={24}
+                color={colors.textMuted}
+              />
+              <ThemedText
+                style={[styles.featureText, { color: colors.textSecondary }]}
+              >
                 Upgrade available in Settings
               </ThemedText>
             </View>
