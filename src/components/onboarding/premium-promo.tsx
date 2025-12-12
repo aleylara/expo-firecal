@@ -165,8 +165,7 @@ export function PremiumPromo() {
             <ThemedText style={styles.title}>FireCal Pro</ThemedText>
 
             <ThemedText style={styles.description}>
-              The essential toolkit built for firefighters and their families. Core features
-              are free and always will be. 
+              Core app features are free and always will be.
             </ThemedText>
 
             {/* Pro Features Card */}
@@ -204,10 +203,10 @@ export function PremiumPromo() {
                 </View>
                 <View style={styles.featureTextContainer}>
                   <ThemedText style={styles.featureTitle}>
-                    Advanced Logging
+                    Full logbook access
                   </ThemedText>
                   <ThemedText style={styles.featureSubtitle}>
-                    Track overtime, recalls, and personal logbook entries.
+                    Track recalls, staybacks, and personal logbook entries.
                   </ThemedText>
                 </View>
               </View>
@@ -225,7 +224,7 @@ export function PremiumPromo() {
                     Data Export
                   </ThemedText>
                   <ThemedText style={styles.featureSubtitle}>
-                    Export timesheets to CSV or Text files.
+                    Export timesheets and logbooks files to the cloud.
                   </ThemedText>
                 </View>
               </View>
