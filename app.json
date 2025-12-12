@@ -23,6 +23,7 @@
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/icons/adaptive-icon.png"
       },
+      "allowBackup": false,
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
       "package": "com.aleylara.firecal"
