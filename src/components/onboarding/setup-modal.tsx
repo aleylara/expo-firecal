@@ -24,7 +24,6 @@ import {
   type ThemeMode,
 } from '@/contexts/theme-context';
 import { useThemedStyles } from '@/hooks/use-themed-styles';
-import { PLATOON_COLORS } from '@/constants/theme';
 import { Button } from '@/components/ui/button';
 
 // Helper component for section headers
@@ -39,7 +38,9 @@ const SectionHeader = ({
 }) => (
   <View style={localStyles.sectionHeader}>
     <Ionicons name={icon} size={18} color={colors.primary} />
-    <ThemedText style={[localStyles.sectionTitle, { color: colors.textSecondary }]}>
+    <ThemedText
+      style={[localStyles.sectionTitle, { color: colors.textSecondary }]}
+    >
       {title.toUpperCase()}
     </ThemedText>
   </View>
@@ -47,9 +48,8 @@ const SectionHeader = ({
 
 export function SetupModal() {
   const { completeSetup } = useOnboarding();
-  const { themeMode, setThemeMode, userGroup, setUserGroup, colorScheme } =
-    useTheme();
-  const { colors, tokens, platoonColors } = useThemedStyles();
+  const { themeMode, setThemeMode, userGroup, setUserGroup } = useTheme();
+  const { colors, platoonColors } = useThemedStyles();
 
   const [selectedLetter, setSelectedLetter] = useState<GroupLetter>(
     userGroup.group,
@@ -70,13 +70,13 @@ export function SetupModal() {
     if (!isValid) return;
 
     // Save all settings
-    await setUserGroup({
+    setUserGroup({
       group: selectedLetter,
       number: selectedNumber,
       baseStation: selectedStation,
     });
     // Ensure theme is saved (it might be already set by handleThemeChange)
-    await setThemeMode(selectedTheme);
+    setThemeMode(selectedTheme);
 
     // Move to tour
     completeSetup();
@@ -95,24 +95,39 @@ export function SetupModal() {
 
   return (
     <Modal visible={true} animationType="fade">
-      <View style={[localStyles.container, { backgroundColor: colors.background }]}>
-        <ScrollView 
+      <View
+        style={[localStyles.container, { backgroundColor: colors.background }]}
+      >
+        <ScrollView
           contentContainerStyle={localStyles.content}
           showsVerticalScrollIndicator={false}
         >
           {/* Header */}
           <View style={localStyles.header}>
-            <View style={[localStyles.iconCircle, { backgroundColor: colors.surfaceElevated }]}>
-               <Ionicons name="calendar-outline" size={32} color={colors.primary} />
+            <View
+              style={[
+                localStyles.iconCircle,
+                { backgroundColor: colors.surfaceElevated },
+              ]}
+            >
+              <Ionicons
+                name="calendar-outline"
+                size={32}
+                color={colors.primary}
+              />
             </View>
-            <ThemedText style={[localStyles.title, { color: colors.text }]}>Welcome to FireCal</ThemedText>
-            <ThemedText style={[localStyles.subtitle, { color: colors.textSecondary }]}>
-              Let's set up your profile. You can change these later in Settings.
+            <ThemedText style={[localStyles.title, { color: colors.text }]}>
+              Welcome to FireCal
+            </ThemedText>
+            <ThemedText
+              style={[localStyles.subtitle, { color: colors.textSecondary }]}
+            >
+              Let&apos;s set up your profile. You can change these later in
+              Settings.
             </ThemedText>
           </View>
 
           <View style={{ width: '100%', maxWidth: 600, alignSelf: 'center' }}>
-            
             {/* Theme Section */}
             <View style={localStyles.sectionContainer}>
               <SectionHeader
@@ -157,7 +172,9 @@ export function SetupModal() {
                         <ThemedText
                           style={[
                             localStyles.themeButtonText,
-                            { color: isActive ? colors.text : colors.textMuted },
+                            {
+                              color: isActive ? colors.text : colors.textMuted,
+                            },
                           ]}
                         >
                           {option.label}
@@ -187,7 +204,11 @@ export function SetupModal() {
               >
                 {/* Group Letter */}
                 <View style={localStyles.settingRow}>
-                  <ThemedText style={[localStyles.settingLabel, { color: colors.text }]}>Platoon</ThemedText>
+                  <ThemedText
+                    style={[localStyles.settingLabel, { color: colors.text }]}
+                  >
+                    Platoon
+                  </ThemedText>
                   <View style={localStyles.groupToggles}>
                     {(['A', 'B', 'C', 'D'] as GroupLetter[]).map((letter) => (
                       <TouchableOpacity
@@ -223,17 +244,28 @@ export function SetupModal() {
                 </View>
 
                 <View
-                  style={[localStyles.divider, { backgroundColor: colors.borderLight }]}
+                  style={[
+                    localStyles.divider,
+                    { backgroundColor: colors.borderLight },
+                  ]}
                 />
 
                 {/* Group Number */}
                 <View
                   style={[
                     localStyles.settingRow,
-                    { flexDirection: 'column', alignItems: 'flex-start', gap: 12 },
+                    {
+                      flexDirection: 'column',
+                      alignItems: 'flex-start',
+                      gap: 12,
+                    },
                   ]}
                 >
-                  <ThemedText style={[localStyles.settingLabel, { color: colors.text }]}>Leave Group</ThemedText>
+                  <ThemedText
+                    style={[localStyles.settingLabel, { color: colors.text }]}
+                  >
+                    Leave Group
+                  </ThemedText>
                   <ScrollView
                     horizontal
                     showsHorizontalScrollIndicator={false}
@@ -247,7 +279,9 @@ export function SetupModal() {
                             style={[
                               localStyles.numberButton,
                               {
-                                borderColor: selectedLetter ? platoonColors[selectedLetter] : colors.border,
+                                borderColor: selectedLetter
+                                  ? platoonColors[selectedLetter]
+                                  : colors.border,
                                 backgroundColor:
                                   selectedNumber === number && selectedLetter
                                     ? platoonColors[selectedLetter]
@@ -263,7 +297,9 @@ export function SetupModal() {
                                   color:
                                     selectedNumber === number && selectedLetter
                                       ? '#FFF'
-                                      : (selectedLetter ? platoonColors[selectedLetter] : colors.text),
+                                      : selectedLetter
+                                        ? platoonColors[selectedLetter]
+                                        : colors.text,
                                 },
                               ]}
                             >
@@ -280,11 +316,7 @@ export function SetupModal() {
 
             {/* Base Section */}
             <View style={localStyles.sectionContainer}>
-              <SectionHeader
-                title="Base"
-                icon="home-outline"
-                colors={colors}
-              />
+              <SectionHeader title="Base" icon="home-outline" colors={colors} />
               <View
                 style={[
                   localStyles.card,
@@ -298,7 +330,11 @@ export function SetupModal() {
                   style={localStyles.settingRow}
                   onPress={() => setShowStationPicker(true)}
                 >
-                  <ThemedText style={[localStyles.settingLabel, { color: colors.text }]}>Station</ThemedText>
+                  <ThemedText
+                    style={[localStyles.settingLabel, { color: colors.text }]}
+                  >
+                    Station
+                  </ThemedText>
                   <View style={localStyles.valueContainer}>
                     <ThemedText
                       style={[
@@ -323,7 +359,7 @@ export function SetupModal() {
             </View>
 
             <View style={localStyles.footer}>
-              <Button 
+              <Button
                 title="Continue"
                 onPress={handleContinue}
                 disabled={!isValid}
@@ -341,7 +377,10 @@ export function SetupModal() {
         >
           <View style={localStyles.modalOverlay}>
             <View
-              style={[localStyles.modalContent, { backgroundColor: colors.surface }]}
+              style={[
+                localStyles.modalContent,
+                { backgroundColor: colors.surface },
+              ]}
             >
               <View
                 style={[
@@ -349,11 +388,19 @@ export function SetupModal() {
                   { borderBottomColor: colors.borderLight },
                 ]}
               >
-                <ThemedText style={[localStyles.modalTitle, { color: colors.text }]}>
+                <ThemedText
+                  style={[localStyles.modalTitle, { color: colors.text }]}
+                >
                   Select Base Station
                 </ThemedText>
                 <TouchableOpacity onPress={() => setShowStationPicker(false)}>
-                  <ThemedText style={{ color: colors.primary, fontSize: 16, fontWeight: '600' }}>
+                  <ThemedText
+                    style={{
+                      color: colors.primary,
+                      fontSize: 16,
+                      fontWeight: '600',
+                    }}
+                  >
                     Done
                   </ThemedText>
                 </TouchableOpacity>
@@ -374,7 +421,14 @@ export function SetupModal() {
                       setShowStationPicker(false);
                     }}
                   >
-                    <ThemedText style={[localStyles.stationItemText, { color: colors.text }]}>{label}</ThemedText>
+                    <ThemedText
+                      style={[
+                        localStyles.stationItemText,
+                        { color: colors.text },
+                      ]}
+                    >
+                      {label}
+                    </ThemedText>
                     {selectedStation === label && (
                       <Ionicons
                         name="checkmark"

@@ -162,11 +162,11 @@ export function PremiumPromo() {
               />
             </View>
 
-            <ThemedText style={styles.title}>Welcome</ThemedText>
+            <ThemedText style={styles.title}>FireCal Pro</ThemedText>
 
             <ThemedText style={styles.description}>
-              The essential toolkit for NSW firefighters. Core features
-              are free forever.
+              The essential toolkit built for firefighters and their families. Core features
+              are free and always will be. 
             </ThemedText>
 
             {/* Pro Features Card */}
@@ -245,19 +245,6 @@ export function PremiumPromo() {
                   <ThemedText style={styles.featureSubtitle}>
                     Directly support a fellow firefighter.
                   </ThemedText>
-                  <View style={styles.samiContainer}>
-                    <ThemedText
-                      style={[styles.featureSubtitle, { fontStyle: 'italic' }]}
-                    >
-                      Cheers, Sami
-                    </ThemedText>
-                    <Ionicons
-                      name="beer-outline"
-                      size={14}
-                      color={colors.textSecondary}
-                      style={{ marginLeft: 4 }}
-                    />
-                  </View>
                 </View>
               </View>
             </View>

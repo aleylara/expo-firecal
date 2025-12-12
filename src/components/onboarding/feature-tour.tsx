@@ -25,7 +25,7 @@ const TOUR_STEPS: TourStep[] = [
   {
     title: 'Calendar & Shifts',
     description:
-      'View your shifts rotations at a glance. Tap dates to add notes or log work hours.',
+      'View your shift rotations at a glance. Tap dates to add notes or log work hours.',
     targetTab: 0,
   },
   {
