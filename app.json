@@ -4,7 +4,7 @@
     "slug": "firecal",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icons/ios-light.png",
+    "icon": "./assets/images/icons/ios-icon.png",
     "scheme": "com.aleylara.firecal",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -13,9 +13,9 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.aleylara.firecal",
       "icon": {
-        "light": "./assets/images/icons/ios-light.png",
-        "dark": "./assets/images/icons/ios-dark.png",
-        "tinted": "./assets/images/icons/ios-tinted.png"
+        "light": "./assets/images/icons/ios-icon.png",
+        "dark": "./assets/images/icons/ios-icon.png",
+        "tinted": "./assets/images/icons/ios-icon.png"
       }
     },
     "android": {
@@ -47,12 +47,12 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/icons/splash-icon-light.png",
+          "image": "./assets/images/icons/splash-icon.png",
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#ffffff",
           "dark": {
-            "image": "./assets/images/icons/splash-icon-dark.png",
+            "image": "./assets/images/icons/splash-icon.png",
             "backgroundColor": "#000000"
           },
           "android": {
